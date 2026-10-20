@@ -210,6 +210,11 @@
     font-size: 5px;
   }
 }
+@media (max-width: 272px) {
+  .navbar__brand-name {
+  display: none;
+  }
+}
 
 /* احترام إعدادات تقليل الحركة */
 @media (prefers-reduced-motion: reduce) {

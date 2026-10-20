@@ -194,16 +194,8 @@
 }
 @media (max-width: 400px) {
   .navbar__brand-name {
-    font-size: 16px;
+   display: none;
   }
-
-  .navbar__brand-caption {
-    font-size: 10px;
-  }
-}
-@media (max-width: 355px) {
-  .navbar__brand-name {
-    display: none;
   }
 }
 

@@ -1,0 +1,201 @@
+
+/* =========================
+   Navbar
+========================= */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  width: 100%;
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: 0 2px 8px rgb(61 57 53 / 5%);
+}
+
+.navbar__container {
+  max-width: 1440px;
+  min-height: 76px;
+  margin-inline: auto;
+  padding-inline: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+/* =========================
+   Brand / Logo
+========================= */
+
+.navbar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+
+.navbar__logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+}
+
+.navbar__logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.navbar__brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.4;
+}
+
+.navbar__brand-name {
+  font-family: "IBM Plex Sans Arabic", sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.navbar__brand-caption {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+/* =========================
+   Navigation Links
+========================= */
+
+.navbar__nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 11px 16px;
+  border-radius: var(--border-radius-md);
+
+  color: var(--color-text-muted);
+  text-decoration: none;
+  white-space: nowrap;
+
+  font-size: 15px;
+  font-weight: 500;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.navbar__link:hover {
+  color: var(--color-primary);
+  background-color: #EAF4F6;
+}
+
+.navbar__link.is-active {
+  color: var(--color-primary);
+  background-color: #EAF4F6;
+  font-weight: 700;
+}
+
+.navbar__link:focus-visible,
+.navbar__brand:focus-visible,
+.navbar__toggle:focus-visible {
+  outline: 3px solid var(--color-secondary-bright);
+  outline-offset: 3px;
+}
+
+/* =========================
+   Mobile Menu Button
+========================= */
+
+.navbar__toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  width: 44px;
+  height: 44px;
+  padding: 0;
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-primary);
+
+  cursor: pointer;
+}
+
+.navbar__toggle svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* =========================
+   Responsive Design
+========================= */
+
+@media (max-width: 768px) {
+  .navbar__container {
+    min-height: 68px;
+    padding-inline: 16px;
+    flex-wrap: wrap;
+    gap: 0;
+  }
+
+  .navbar__toggle {
+    display: inline-flex;
+  }
+
+  .navbar__nav {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+
+    width: 100%;
+    padding-block: 12px 16px;
+  }
+
+  .navbar__nav.is-open {
+    display: flex;
+  }
+
+  .navbar__link {
+    justify-content: flex-start;
+    width: 100%;
+    padding: 12px 14px;
+  }
+
+  .navbar__brand-name {
+    font-size: 18px;
+  }
+
+  .navbar__brand-caption {
+    font-size: 11px;
+  }
+}
+
+/* احترام إعدادات تقليل الحركة */
+@media (prefers-reduced-motion: reduce) {
+  .navbar__link {
+    transition: none;
+  }
+}

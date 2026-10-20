@@ -1,0 +1,125 @@
+{
+  "deeds": [
+    {
+      "id": 1,
+      "project": "HHR",
+      "deedNumber": "217901006826",
+      "gregorianDate": "2026-06-04",
+      "hijriDate": "18/12/1447",
+      "area": 777.27,
+      "region": "منطقة مكة المكرمة",
+      "city": "مكة المكرمة",
+      "transactionType": "هبة"
+    },
+    {
+      "id": 2,
+      "project": "HHR",
+      "deedNumber": "217901006829",
+      "gregorianDate": "2026-06-04",
+      "hijriDate": "18/12/1447",
+      "area": 142.40,
+      "region": "منطقة مكة المكرمة",
+      "city": "مكة المكرمة",
+      "transactionType": "هبة"
+    },
+    {
+      "id": 3,
+      "project": "HHR",
+      "deedNumber": "217913003716",
+      "gregorianDate": "2026-06-17",
+      "hijriDate": "02/01/1448",
+      "area": 1050.95,
+      "region": "منطقة مكة المكرمة",
+      "city": "جدة",
+      "transactionType": "هبة"
+    },
+    {
+      "id": 4,
+      "project": "HHR",
+      "deedNumber": "217913003739",
+      "gregorianDate": "2026-06-17",
+      "hijriDate": "02/01/1448",
+      "area": 625.00,
+      "region": "منطقة مكة المكرمة",
+      "city": "جدة",
+      "transactionType": "هبة"
+    },
+    {
+      "id": 5,
+      "project": "HHR",
+      "deedNumber": "217913003747",
+      "gregorianDate": "2026-06-17",
+      "hijriDate": "02/01/1448",
+      "area": 111.06,
+      "region": "منطقة مكة المكرمة",
+      "city": "جدة",
+      "transactionType": "هبة"
+    },
+    {
+      "id": 6,
+      "project": "NSR",
+      "deedNumber": "317901006455",
+      "gregorianDate": "2026-04-14",
+      "hijriDate": "26/10/1447",
+      "area": 2366997.94,
+      "region": "منطقة الحدود الشمالية",
+      "city": "طريف",
+      "transactionType": "هبة"
+    },
+    {
+      "id": 7,
+      "project": "HHR",
+      "deedNumber": "317901006823",
+      "gregorianDate": "2026-06-04",
+      "hijriDate": "18/12/1447",
+      "area": 748.00,
+      "region": "منطقة مكة المكرمة",
+      "city": "مكة المكرمة",
+      "transactionType": "هبة"
+    },
+    {
+      "id": 8,
+      "project": "HHR",
+      "deedNumber": "317901006827",
+      "gregorianDate": "2026-06-04",
+      "hijriDate": "18/12/1447",
+      "area": 798.00,
+      "region": "منطقة مكة المكرمة",
+      "city": "مكة المكرمة",
+      "transactionType": "هبة"
+    },
+    {
+      "id": 9,
+      "project": "HHR",
+      "deedNumber": "317901006831",
+      "gregorianDate": "2026-06-04",
+      "hijriDate": "18/12/1447",
+      "area": 750.00,
+      "region": "منطقة مكة المكرمة",
+      "city": "مكة المكرمة",
+      "transactionType": "هبة"
+    },
+    {
+      "id": 10,
+      "project": "HHR",
+      "deedNumber": "317901006832",
+      "gregorianDate": "2026-06-04",
+      "hijriDate": "18/12/1447",
+      "area": 750.00,
+      "region": "منطقة مكة المكرمة",
+      "city": "مكة المكرمة",
+      "transactionType": "هبة"
+    },
+    {
+      "id": 11,
+      "project": "HHR",
+      "deedNumber": "317901006833",
+      "gregorianDate": "2026-06-04",
+      "hijriDate": "18/12/1447",
+      "area": 774.00,
+      "region": "منطقة مكة المكرمة",
+      "city": "مكة المكرمة",
+      "transactionType": "هبة"
+    }
+  ]
+}

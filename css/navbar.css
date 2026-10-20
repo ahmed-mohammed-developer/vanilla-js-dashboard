@@ -203,22 +203,7 @@
 }
 @media (max-width: 355px) {
   .navbar__brand-name {
-    font-size: 10px;
-  }
-
-  .navbar__brand-caption {
-    font-size: 5px;
-  }
-}
-@media (max-width: 272px) {
-  .navbar__brand-name {
-  display: none;
+    display: none;
   }
 }
 
-/* احترام إعدادات تقليل الحركة */
-@media (prefers-reduced-motion: reduce) {
-  .navbar__link {
-    transition: none;
-  }
-}

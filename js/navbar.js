@@ -46,11 +46,18 @@ if (navbarContainer) {
         >
           <a
             class="navbar__link is-active"
-            href="#home"
+            href="/index.html"
             data-page="home"
             aria-current="page"
           >
             الرئيسية
+          </a>
+          <a
+            class="navbar__link"
+            href="/target2026.html"
+            data-page="target2026.html"
+          >
+             هدف 2026م
           </a>
 
           <a

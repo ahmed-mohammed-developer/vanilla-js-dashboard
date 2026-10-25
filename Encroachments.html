@@ -46,7 +46,7 @@
     <title>نقل الصكوك</title>
     <link rel="stylesheet" href="css/style.css">
 
-  <script src="js/main.js" defer></script>
+  <script src="js/main.js" type="module" defer></script>
 </head>
 <body>
       <!-- تحميل النافبار هنا -->
@@ -71,11 +71,95 @@
         </div>
         <span id="record-count" class="record-count">جارٍ تحميل البيانات...</span>
       </div>
+
+
+
+      
       <div id="kpi-container" class="kpi-grid" aria-live="polite"></div>
+
+
+
+
       <p id="data-note" class="data-note" hidden></p>
       <p id="load-error" class="load-error" role="alert" hidden></p>
     </section>
-  </main>
+<section class="charts-section">
 
+  <!-- دونات التصنيف -->
+  <div class="chart-card">
+
+    <div class="chart-header">
+      <div>
+        <h2>تصنيف التعديات</h2>
+        <p>العقود المنتهية مقابل وضع اليد</p>
+      </div>
+
+      <button  class="reset-filter">
+        عرض جميع البيانات
+      </button>
+
+    </div>
+
+    <div class="chart-wrapper">
+
+      <canvas id="encroachmentsChart"></canvas>
+
+      <div class="chart-center">
+        <strong id="chart-total">0</strong>
+        <span>إجمالي التعديات</span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- دونات حالة التعدي -->
+  <div class="chart-card">
+
+    <div class="chart-header">
+      <div>
+        <h2>حالة التعدي</h2>
+        <p>التوزيع حسب الحالة الحالية</p>
+      </div>
+         <button  class="reset-filter">
+        عرض جميع البيانات
+      </button>
+    </div>
+
+    <div class="chart-wrapper">
+
+      <canvas id="statusChart"></canvas>
+
+      <div class="chart-center">
+        <strong id="status-total">0</strong>
+        <span>حالة التعدي</span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- الشارت الثالث -->
+  <div class="chart-card">
+
+    <div class="chart-header">
+      <div>
+        <h2>حالة القضية</h2>
+        <p>سيتم إضافته لاحقاً</p>
+      </div>
+    </div>
+
+    <div class="chart-placeholder">
+      قريباً
+    </div>
+
+  </div>
+
+</section>
+
+
+
+  </main>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>

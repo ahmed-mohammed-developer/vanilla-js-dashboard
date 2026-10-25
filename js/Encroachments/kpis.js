@@ -5,6 +5,10 @@
  */
 
 const DATA_URL = "./data/encroachments.json";
+let donutChart = null;
+let statusChart = null;
+let originalRecords = [];
+let currentRecords = [];
 
 const icons = {
   total: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 1 4 16.5z"/><path d="M4 16a2.5 2.5 0 0 1 2.5-2.5H20M8 7h8M8 10h5"/></svg>',
@@ -28,6 +32,13 @@ const hasValue = value =>
   value !== undefined &&
   String(value).trim() !== "";
 
+function refreshDashboard(records) {
+  currentRecords = records;
+  renderKpis(records);
+  renderDonutChart(records);
+  renderStatusChart(records);
+}
+
 function normalize(value) {
   return String(value ?? "")
     .trim()
@@ -35,7 +46,6 @@ function normalize(value) {
 }
 
 function calculateKpis(records) {
-
   const expired = r =>
     normalize(r["التصنيف"]) === "عقد منتهى";
 
@@ -75,7 +85,6 @@ function calculateKpis(records) {
       color: "#00778B",
       detail: "عدد السجلات في قاعدة البيانات."
     },
-    
     {
       id: "expired",
       label: "العقود المنتهية",
@@ -100,7 +109,7 @@ function calculateKpis(records) {
       color: "#16856B",
       detail: "السجلات التي تم إخلاؤها."
     },
-     {
+    {
       id: "active",
       label: "التعديات القائمة",
       value: countWhere(
@@ -122,7 +131,6 @@ function calculateKpis(records) {
       color: "#8A6BBE",
       detail: "التعديات المحالة للإدارة القانونية."
     },
-   
     {
       id: "cities",
       label: "عدد المدن",
@@ -178,8 +186,221 @@ function calculateKpis(records) {
   ];
 }
 
-function renderKpis(records) {
+function renderStatusChart(records) {
+  const statusCounts = {};
 
+  records.forEach(record => {
+    const status =
+      normalize(record["حالة_التعدي"]) ||
+      "غير محدد";
+
+    statusCounts[status] =
+      (statusCounts[status] || 0) + 1;
+  });
+
+  const labels = Object.keys(statusCounts);
+  const values = Object.values(statusCounts);
+
+  const totalElement =
+    document.getElementById("status-total");
+
+  if (totalElement) {
+    totalElement.textContent = records.length;
+  }
+
+  const colors = [
+    "#00778B",
+    "#71B2C9",
+    "#16856B",
+    "#CB2C30",
+    "#F1B434",
+    "#768692",
+    "#8A6BBE"
+  ];
+
+  const canvas =
+    document.getElementById("statusChart");
+
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+
+  if (statusChart) {
+    statusChart.destroy();
+  }
+
+  statusChart = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: colors.slice(0, labels.length),
+        borderColor: "#FFFFFF",
+        borderWidth: 3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: "50%",
+      plugins: {
+        legend: {
+          position: "bottom"
+        },
+        tooltip: {
+          callbacks: {
+            label(context) {
+              const total =
+                context.dataset.data.reduce(
+                  (a, b) => a + b,
+                  0
+                );
+
+              const value = context.raw;
+
+              const percent =
+                (
+                  (value / total) * 100
+                ).toFixed(1);
+
+              return `${context.label}: ${value} (${percent}%)`;
+            }
+          }
+        }
+      },
+      onClick(event, elements) {
+        if (!elements.length) return;
+
+        const selectedStatus =
+          labels[elements[0].index];
+
+        const filteredRecords =
+          originalRecords.filter(
+            r =>
+              normalize(
+                r["حالة_التعدي"]
+              ) === selectedStatus
+          );
+
+        refreshDashboard(filteredRecords);
+
+        document.getElementById(
+          "active-filter"
+        ).textContent =
+          `التصفية الحالية: ${selectedStatus}`;
+      }
+    }
+  });
+}
+
+function renderDonutChart(records) {
+  const expiredRecords = records.filter(
+    r => normalize(r["التصنيف"]) === "عقد منتهى"
+  );
+
+  const handRecords = records.filter(
+    r => normalize(r["التصنيف"]) === "وضع يد"
+  );
+
+  const totalElement =
+    document.getElementById("chart-total");
+
+  const chartCanvas =
+    document.getElementById("encroachmentsChart");
+
+  if (!chartCanvas) return;
+
+  if (totalElement) {
+    totalElement.textContent = records.length;
+  }
+
+  const ctx = chartCanvas.getContext("2d");
+
+  if (donutChart) {
+    donutChart.destroy();
+  }
+
+  donutChart = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: [
+        "العقود المنتهية",
+        "وضع اليد"
+      ],
+      datasets: [{
+        data: [
+          expiredRecords.length,
+          handRecords.length
+        ],
+        backgroundColor: [
+          "#00778B",
+          "#71B2C9"
+        ],
+        borderColor: "#FFFFFF",
+        borderWidth: 4,
+        hoverOffset: 12
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: "50%",
+      plugins: {
+        legend: {
+          position: "bottom",
+          labels: {
+            usePointStyle: true,
+            font: {
+              family: "IBM Plex Sans Arabic",
+              size: 13
+            }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label(context) {
+              const total =
+                context.dataset.data.reduce(
+                  (a, b) => a + b,
+                  0
+                );
+
+              const value = context.raw;
+
+              const percent =
+                ((value / total) * 100)
+                  .toFixed(1);
+
+              return `${context.label}: ${value} (${percent}%)`;
+            }
+          }
+        }
+      },
+      onClick(event, elements) {
+        if (!elements.length) return;
+
+        const index = elements[0].index;
+
+        if (index === 0) {
+          refreshDashboard(expiredRecords);
+          document.getElementById("active-filter")
+            .textContent =
+            "التصفية الحالية: العقود المنتهية";
+        }
+
+        if (index === 1) {
+          refreshDashboard(handRecords);
+          document.getElementById("active-filter")
+            .textContent =
+            "التصفية الحالية: وضع اليد";
+        }
+      }
+    }
+  });
+}
+
+function renderKpis(records) {
   const container = document.getElementById("kpi-container");
   const countLabel = document.getElementById("record-count");
   const note = document.getElementById("data-note");
@@ -205,6 +426,7 @@ function renderKpis(records) {
         <span>تفاصيل المؤشر</span>
         <span class="more">عرض التوضيح ←</span>
       </span>
+    >
     </button>
   `).join("");
 
@@ -224,20 +446,18 @@ ${kpi.detail}`
     });
 
   note.hidden = false;
-note.textContent =
-  `يتم تحديث هذه المؤشرات بشكل يومي بناءً على البيانات الواردة والمعتمدة. العدد الحالي للسجلات هو ${records.length} سجلًا، منها ${
-    kpis.find(k => k.id === "expired").value
-  } عقدًا منتهيًا و${
-    kpis.find(k => k.id === "hand").value
-  } حالة وضع يد.`;
+  note.textContent =
+    `يتم تحديث هذه المؤشرات بشكل يومي بناءً على البيانات الواردة والمعتمدة. العدد الحالي للسجلات هو ${records.length} سجلًا، منها ${
+      kpis.find(k => k.id === "expired").value
+    } عقدًا منتهيًا و${
+      kpis.find(k => k.id === "hand").value
+    } حالة وضع يد.`;
 }
 
 async function initKpis() {
-
   const errorBox = document.getElementById("load-error");
 
   try {
-
     const response = await fetch(DATA_URL);
 
     if (!response.ok) {
@@ -250,10 +470,14 @@ async function initKpis() {
       throw new Error("تنسيق الملف يجب أن يكون JSON Array.");
     }
 
-    renderKpis(records);
+    originalRecords = [...records];
+    currentRecords = [...records];
+
+    renderKpis(currentRecords);
+    renderDonutChart(currentRecords);
+    renderStatusChart(currentRecords);
 
   } catch (error) {
-
     errorBox.hidden = false;
     errorBox.textContent =
       "تعذر تحميل ملف البيانات: " +
@@ -263,5 +487,15 @@ async function initKpis() {
       .textContent = "تعذر التحميل";
   }
 }
+
+document.addEventListener("click", (e) => {
+  if (!e.target.classList.contains("reset-filter"))
+    return;
+
+  refreshDashboard(originalRecords);
+
+  document.getElementById("active-filter")
+    .textContent = "عرض جميع البيانات";
+});
 
 initKpis();

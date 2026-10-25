@@ -1,4 +1,6 @@
 @import url("./navbar.css");
+@import url("./kpis.css");
+
 :root {
   --color-primary: #00778B;
   --color-primary-dark: #3D3935;

@@ -1,4 +1,3 @@
-
 const navbarContainer = document.querySelector("#navbar-container");
 
 if (navbarContainer) {
@@ -7,10 +6,9 @@ if (navbarContainer) {
       <div class="navbar__container">
 
         <!-- الشعار -->
-        <a class="navbar__brand" href="#home" aria-label="سار - الرئيسية">
+        <a class="navbar__brand" href="/index.html" aria-label="سار - الرئيسية">
           <span class="navbar__logo" aria-hidden="true">
-          <img src="assets/images/sar-logo.png" alt="شعار سار">
-
+            <img src="assets/images/sar-logo.png" alt="شعار سار">
           </span>
 
           <span class="navbar__brand-text">
@@ -44,44 +42,20 @@ if (navbarContainer) {
           id="primary-navigation"
           aria-label="القائمة الرئيسية"
         >
-          <a
-            class="navbar__link is-active"
-            href="/index.html"
-            data-page="home"
-            aria-current="page"
-          >
+          <a class="navbar__link" href="/index.html" data-page="index.html">
             الرئيسية
           </a>
-          <a
-            class="navbar__link"
-            href="/target2026.html"
-            data-page="target2026.html"
-          >
-             هدف 2026م
+
+          <a class="navbar__link" href="/target2026.html" data-page="target2026.html">
+            هدف 2026م
           </a>
 
-          <a
-            class="navbar__link"
-            href="#deeds"
-            data-page="deeds"
-          >
+          <a class="navbar__link" href="/deeds.html" data-page="deeds.html">
             نقل الصكوك
           </a>
 
-          <a
-            class="navbar__link"
-            href="#encroachments"
-            data-page="encroachments"
-          >
+          <a class="navbar__link" href="/encroachments.html" data-page="encroachments.html">
             التعديات
-          </a>
-
-          <a
-            class="navbar__link"
-            href="#transactions"
-            data-page="transactions"
-          >
-            المعاملات
           </a>
         </nav>
 
@@ -93,7 +67,36 @@ if (navbarContainer) {
   const navigation = navbarContainer.querySelector(".navbar__nav");
   const navLinks = navbarContainer.querySelectorAll(".navbar__link");
 
+  // ========================================
+  // تحديد الرابط النشط بناءً على الصفحة الحالية
+  // ========================================
+
+  const currentPath = window.location.pathname;
+
+  // استخراج اسم الصفحة من الرابط
+  const currentPage = currentPath.split("/").pop().toLowerCase();
+
+  // اعتبار الصفحة الرئيسية هي index.html إذا كان المسار فارغًا
+  const activePage = currentPage || "index.html";
+
+  navLinks.forEach((link) => {
+    const linkPage = link.dataset.page.toLowerCase();
+
+    const isActive = linkPage === activePage;
+
+    link.classList.toggle("is-active", isActive);
+
+    if (isActive) {
+      link.setAttribute("aria-current", "page");
+    } else {
+      link.removeAttribute("aria-current");
+    }
+  });
+
+  // ========================================
   // فتح القائمة أو إغلاقها
+  // ========================================
+
   function setMenuOpen(isOpen) {
     navigation.classList.toggle("is-open", isOpen);
 
@@ -113,17 +116,9 @@ if (navbarContainer) {
     setMenuOpen(!isOpen);
   });
 
-  // تحديد الرابط النشط
+  // إغلاق القائمة عند الضغط على أحد الروابط
   navLinks.forEach((link) => {
     link.addEventListener("click", () => {
-      navLinks.forEach((item) => {
-        item.classList.remove("is-active");
-        item.removeAttribute("aria-current");
-      });
-
-      link.classList.add("is-active");
-      link.setAttribute("aria-current", "page");
-
       setMenuOpen(false);
     });
   });

@@ -426,7 +426,6 @@ function renderKpis(records) {
         <span>تفاصيل المؤشر</span>
         <span class="more">عرض التوضيح ←</span>
       </span>
-    >
     </button>
   `).join("");
 

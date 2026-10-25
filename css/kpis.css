@@ -18,17 +18,10 @@
   --shadow-card: 0 5px 18px rgba(32, 61, 68, .055);
 }
 
-@import url("./navbar.css");
 
 * { box-sizing: border-box; padding: 0; margin: 0; }
 
-body {
-  margin: 0;
-  background: var(--color-background);
-  color: var(--color-text);
-  font-family: "Tajawal", sans-serif;
-  line-height: 1.7;
-}
+
 
 button, a { font: inherit; }
 

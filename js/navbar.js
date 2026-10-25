@@ -42,19 +42,19 @@ if (navbarContainer) {
           id="primary-navigation"
           aria-label="القائمة الرئيسية"
         >
-          <a class="navbar__link" href="/index.html" data-page="index.html">
+          <a class="navbar__link" href="index.html" data-page="index.html">
             الرئيسية
           </a>
 
-          <a class="navbar__link" href="/target2026.html" data-page="target2026.html">
+          <a class="navbar__link" href="target2026.html" data-page="target2026.html">
             هدف 2026م
           </a>
 
-          <a class="navbar__link" href="/deeds.html" data-page="deeds.html">
+          <a class="navbar__link" href="deeds.html" data-page="deeds.html">
             نقل الصكوك
           </a>
 
-          <a class="navbar__link" href="/encroachments.html" data-page="encroachments.html">
+          <a class="navbar__link" href="encroachments.html" data-page="encroachments.html">
             التعديات
           </a>
         </nav>

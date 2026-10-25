@@ -224,12 +224,12 @@ ${kpi.detail}`
     });
 
   note.hidden = false;
-  note.textContent =
-    `ملف البيانات يحتوي على ${records.length} سجلًا، منها ${
-      kpis.find(k => k.id === "expired").value
-    } عقدًا منتهيًا و${
-      kpis.find(k => k.id === "hand").value
-    } حالة وضع يد.`;
+note.textContent =
+  `يتم تحديث هذه المؤشرات بشكل يومي بناءً على البيانات الواردة والمعتمدة. العدد الحالي للسجلات هو ${records.length} سجلًا، منها ${
+    kpis.find(k => k.id === "expired").value
+  } عقدًا منتهيًا و${
+    kpis.find(k => k.id === "hand").value
+  } حالة وضع يد.`;
 }
 
 async function initKpis() {

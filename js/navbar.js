@@ -4,18 +4,6 @@ if (navbarContainer) {
   navbarContainer.innerHTML = `
     <header class="navbar">
       <div class="navbar__container">
-
-        <!-- الشعار -->
-        <a class="navbar__brand" href="/index.html" aria-label="سار - الرئيسية">
-          <span class="navbar__logo" aria-hidden="true">
-            <img src="assets/images/sar-logo.png" alt="شعار سار">
-          </span>
-
-          <span class="navbar__brand-text">
-            <span class="navbar__brand-name">الشركة السعودية للخطوط الحديدية</span>
-          </span>
-        </a>
-
         <!-- زر قائمة الجوال -->
         <button
           class="navbar__toggle"
@@ -58,7 +46,16 @@ if (navbarContainer) {
             التعديات
           </a>
         </nav>
+ <!-- الشعار -->
+        <a class="navbar__brand" href="/index.html" aria-label="سار - الرئيسية">
 
+          <span class="navbar__brand-text">
+            <span class="navbar__brand-name">الشركة السعودية للخطوط الحديدية</span>
+          </span>
+          <span class="navbar__logo" aria-hidden="true">
+            <img src="assets/images/sar-logo.png" alt="شعار سار">
+          </span>
+        </a>
       </div>
     </header>
   `;

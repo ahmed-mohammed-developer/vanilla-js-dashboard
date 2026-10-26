@@ -78,17 +78,8 @@ function calculateKpis(records) {
 
   return [
     { id: "total", label: "إجمالي التعديات", value: records.length, icon: "total", color: "#00778B", detail: "عدد السجلات في قاعدة البيانات." },
-    { id: "expired", label: "العقود المنتهية", value: countWhere(records, expired), icon: "contract", color: "#71B2C9", detail: "السجلات المصنفة عقد منتهى." },
-    { id: "hand", label: "تعديات وضع اليد", value: countWhere(records, handPossession), icon: "hand", color: "#768692", detail: "السجلات المصنفة وضع يد." },
-    { id: "evicted", label: "تم الإخلاء", value: countWhere(records, evicted), icon: "check", color: "#16856B", detail: "السجلات التي تم إخلاؤها." },
-    { id: "active", label: "التعديات القائمة", value: countWhere(records, r => normalize(r["حالة_التعدي"]) === "قائم"), icon: "active", color: "#CB2C30", detail: "التعديات التي مازالت قائمة." },
-    { id: "legal", label: "لدى القانونية", value: countWhere(records, r => normalize(r["حالة_التعدي"]) === "لدى القانونية"), icon: "legal", color: "#8A6BBE", detail: "التعديات المحالة للإدارة القانونية." },
-    { id: "cities", label: "عدد المدن", value: new Set(records.map(r => normalize(r["المدينة"])).filter(Boolean)).size, icon: "city", color: "#00778B", detail: "عدد المدن المختلفة." },
     { id: "incidents", label: "وقائع إيجارية", value: countWhere(records, rentalIncident), icon: "incident", color: "#C18B20", detail: "السجلات التي لها واقعة إيجارية." },
     { id: "lawsuits", label: "رُفعت عليها قضايا", value: countWhere(records, lawsuit), icon: "case", color: "#5B78B7", detail: "السجلات المرتبطة بقضية أو صك." },
-    { id: "final", label: "أحكام نهائية", value: countWhere(records, finalJudgment), icon: "final", color: "#16856B", detail: "القضايا ذات الحكم النهائي." },
-    { id: "initial", label: "أحكام ابتدائية", value: countWhere(records, initialJudgment), icon: "initial", color: "#D18A35", detail: "القضايا ذات الحكم الابتدائي." },
-    { id: "pending", label: "قضايا منظورة", value: countWhere(records, pendingCase), icon: "pending", color: "#CB2C30", detail: "القضايا المنظورة حالياً." }
   ];
 }
 // نهاية الدالة
@@ -225,35 +216,20 @@ function renderDonutChart(records) {
  */
 function renderKpis(records) {
   const container = document.getElementById("kpi-container");
-  const countLabel = document.getElementById("record-count");
   const formatter = new Intl.NumberFormat("en-US");
   const kpis = calculateKpis(records);
 
-
+  // تم حذف تذييل البطاقة (.kpi-foot) بالكامل من قالب HTML الخاص بالبطاقات
   container.innerHTML = kpis.map(kpi => `
-    <button class="kpi-card" type="button" style="--accent:${kpi.color}" aria-label="${kpi.label}: ${kpi.value}">
+    <div class="kpi-card" style="--accent:${kpi.color}">
       <span class="kpi-card-top">
         <span class="kpi-label">${kpi.label}</span>
         <span class="kpi-icon">${icons[kpi.icon]}</span>
       </span>
       <strong class="kpi-value" dir="ltr">${formatter.format(kpi.value)}</strong>
-      <span class="kpi-foot">
-        <span>تفاصيل المؤشر</span>
-        <span class="more">عرض التوضيح ←</span>
-      </span>
-    </button>
+    </div>
   `).join("");
-
-  // ربط أحداث النقر لعرض تفاصيل المؤشر عند الضغط على البطاقة
-  [...container.querySelectorAll(".kpi-card")].forEach((button, index) => {
-    button.addEventListener("click", () => {
-      const kpi = kpis[index];
-      alert(`${kpi.label}\nالعدد: ${formatter.format(kpi.value)}\n\nطريقة الاحتساب:\n${kpi.detail}`);
-    });
-  });
-
-}
-// نهاية الدالة
+}// نهاية الدالة
 
 /**
  * دالة تهيئة وتحميل بيانات النظام من ملف JSON الخارجي

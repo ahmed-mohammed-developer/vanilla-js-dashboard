@@ -246,14 +246,17 @@ button, a {
 }
 
 .chart-center strong {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--color-primary);
   line-height: 1;
+    margin-top: 6px;
+
 }
 
 .chart-center span {
   margin-top: 6px;
+    font-weight: 700;
   color: var(--color-text-muted);
   font-size: .9rem;
 }
@@ -283,7 +286,50 @@ button, a {
 .reset-filter:hover {
   background: rgba(0, 119, 139, .15);
 }
+/* تنسيق حاوية تفاصيل التصنيف أسفل الشارت */
+.chart-details-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
 
+.chart-detail-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-background);
+  padding: 10px 14px;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.chart-detail-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chart-detail-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.chart-detail-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.chart-detail-stats {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  font-variant-numeric: tabular-nums;
+}
 /* ================================================= التجاوب مع مختلف الشاشات (Media Queries) ================================================= */
 @media (min-width: 1200px) {
   .charts-section { grid-template-columns: repeat(3, 1fr); }
@@ -305,9 +351,18 @@ button, a {
   }
   .chart-card {
 padding: 10px;
- 
+}
+.chart-detail-label {
+  font-size: 0.5rem;
 }
 
+.chart-detail-stats {
+  font-size: 0.5rem;
+}
+.chart-detail-item{
+  padding: 5px 7px;
+}
+}
 @media (max-width: 390px) {
   .kpi-grid { grid-template-columns: 1fr; }
 }

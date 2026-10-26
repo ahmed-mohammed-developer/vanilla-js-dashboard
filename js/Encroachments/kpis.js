@@ -154,15 +154,44 @@ function renderStatusChart(records) {
  * دالة إنشاء وتحديث رسم تصنيف التعديات (عقود منتهية مقابل وضع يد)
  * بداية الدالة
  */
+/**
+ * دالة إنشاء وتحديث رسم تصنيف التعديات (عقود منتهية مقابل وضع يد) مع عرض التفاصيل
+ * بداية الدالة
+ */
 function renderDonutChart(records) {
   const expiredRecords = records.filter(r => normalize(r["التصنيف"]) === "عقد منتهى");
   const handRecords = records.filter(r => normalize(r["التصنيف"]) === "وضع يد");
 
   const totalElement = document.getElementById("chart-total");
   const chartCanvas = document.getElementById("encroachmentsChart");
+  const detailsContainer = document.getElementById("encroachments-legend-details");
+  
   if (!chartCanvas) return;
 
-  if (totalElement) totalElement.textContent = records.length;
+  const total = records.length;
+  if (totalElement) totalElement.textContent = total;
+
+  // تجهيز البيانات والنسب المئوية
+  const dataDetails = [
+    { label: "وضع اليد", count: handRecords.length, color: "#CB2C30", records: handRecords },
+    { label: "العقود المنتهية", count: expiredRecords.length, color: "#768692", records: expiredRecords }
+  ];
+
+  // توليد كاردات التفاصيل HTML تلقائياً
+  if (detailsContainer) {
+    detailsContainer.innerHTML = dataDetails.map(item => {
+      const percent = total > 0 ? ((item.count / total) * 100).toFixed(1) : 0;
+      return `
+        <div class="chart-detail-item">
+          <div class="chart-detail-info">
+            <span class="chart-detail-color" style="background-color: ${item.color};"></span>
+            <span class="chart-detail-label">${item.label}</span>
+          </div>
+          <span class="chart-detail-stats">${item.count} (${percent}%)</span>
+        </div>
+      `;
+    }).join("");
+  }
 
   const ctx = chartCanvas.getContext("2d");
   if (donutChart) donutChart.destroy();
@@ -170,10 +199,10 @@ function renderDonutChart(records) {
   donutChart = new Chart(ctx, {
     type: "doughnut",
     data: {
-      labels: ["العقود المنتهية", "وضع اليد"],
+      labels: dataDetails.map(d => d.label),
       datasets: [{
-        data: [expiredRecords.length, handRecords.length],
-        backgroundColor: ["#768692", "#CB2C30"],
+        data: dataDetails.map(d => d.count),
+        backgroundColor: dataDetails.map(d => d.color),
         borderColor: "#FFFFFF",
         borderWidth: 4,
         hoverOffset: 12
@@ -182,18 +211,14 @@ function renderDonutChart(records) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: "50%",
+      cutout: "55%",
       plugins: {
-        legend: {
-          position: "bottom",
-          labels: { usePointStyle: true, font: { family: "IBM Plex Sans Arabic", size: 13 } }
-        },
+        legend: { display: false }, // قمنا بإلغاء الليجند الافتراضي لأننا صنعنا كاردات مخصصة بدلاً منه
         tooltip: {
           callbacks: {
             label(context) {
-              const total = context.dataset.data.reduce((a, b) => a + b, 0);
               const value = context.raw;
-              const percent = ((value / total) * 100).toFixed(1);
+              const percent = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
               return `${context.label}: ${value} (${percent}%)`;
             }
           }
@@ -202,12 +227,12 @@ function renderDonutChart(records) {
       onClick(event, elements) {
         if (!elements.length) return;
         const index = elements[0].index;
-        if (index === 0) refreshDashboard(expiredRecords);
-        if (index === 1) refreshDashboard(handRecords);
+        refreshDashboard(dataDetails[index].records);
       }
     }
   });
 }
+// نهاية الدالة
 // نهاية الدالة
 
 /**

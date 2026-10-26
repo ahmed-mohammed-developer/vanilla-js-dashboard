@@ -294,7 +294,7 @@ button, a {
 }
 
 @media (max-width: 767px) {
-  .main-content { padding: 5px; }
+  .main-content { padding: 0; }
   .charts-section { grid-template-columns: 1fr; }
   .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .chart-wrapper { height: 280px; }
@@ -303,6 +303,7 @@ button, a {
   .reset-filter{
     font-size: 0.5rem;
   }
+ 
 }
 
 @media (max-width: 390px) {

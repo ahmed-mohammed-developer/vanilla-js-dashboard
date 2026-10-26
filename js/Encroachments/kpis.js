@@ -173,7 +173,7 @@ function renderDonutChart(records) {
       labels: ["العقود المنتهية", "وضع اليد"],
       datasets: [{
         data: [expiredRecords.length, handRecords.length],
-        backgroundColor: ["#00778B", "#71B2C9"],
+        backgroundColor: ["#768692", "#CB2C30"],
         borderColor: "#FFFFFF",
         borderWidth: 4,
         hoverOffset: 12

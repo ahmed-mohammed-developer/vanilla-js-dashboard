@@ -243,6 +243,7 @@ button, a {
   text-align: center;
   pointer-events: none;
   transform: translateY(-10px);
+  gap: 10px;
 }
 
 .chart-center strong {
@@ -250,12 +251,9 @@ button, a {
   font-weight: 700;
   color: var(--color-primary);
   line-height: 1;
-    margin-top: 6px;
-
 }
 
 .chart-center span {
-  margin-top: 6px;
     font-weight: 700;
   color: var(--color-text-muted);
   font-size: .9rem;

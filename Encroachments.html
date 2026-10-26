@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="سار">
-    <!-- ضبط لون ثيم المتصفح ليتوافق مع الهوية البصرية -->
     <meta name="theme-color" content="#00778B">
     
-    <!-- Open Graph: معلومات مشاركة الرابط على منصات التواصل -->
+    <!-- Open Graph: معلومات مشاركة الرابط -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="سار">
     <meta property="og:locale" content="ar_SA">
@@ -16,32 +15,25 @@
     <meta property="og:url" content="https://real-estate-surveving-land-management.netlify.app/encroachments.html" id="og-url">
     <meta property="og:image" content="assets/images/sar-logo.png" id="og-image">
 
-
-    <!-- Favicon: أيقونات تبويب المتصفح -->
+    <!-- Favicon -->
     <link rel="icon" type="image/png" href="assets/images/sar-logo.png">
     <link rel="apple-touch-icon" href="assets/images/sar-logo-s.png">
 
-    <!-- استدعاء الخطوط العربية الرسمية (IBM Plex Sans Arabic & Tajawal) -->
+    <!-- الخطوط -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Tajawal:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <title>التعديات | سار</title>
-    <!-- ربط ملف التنسيقات الرئيسي -->
     <link rel="stylesheet" href="css/style.css">
-    <!-- ربط ملف الجافاسكربت الرئيسي بنظام الوحدات -->
     <script src="js/main.js" type="module" defer></script>
 </head>
 <body>
 
-    <!-- حاوية شريط التنقل (Navbar) الديناميكي -->
     <div id="navbar-container"></div>
 
-    <!-- المحتوى الرئيسي للصفحة -->
     <main class="main-content">
         
-        <!-- الترويسة الرئيسية للصفحة -->
         <header class="page-header">
             <div>
                 <p class="eyebrow">لوحة تحكم</p>
@@ -49,22 +41,20 @@
             </div>
         </header>
 
-        <!-- قسم المؤشرات الرئيسية (KPIs) -->
+        <!-- المؤشرات الرئيسية -->
         <section class="kpi-section" aria-labelledby="kpi-heading">
             <div class="section-heading">
                 <div>
                     <h2 id="kpi-heading">المؤشرات الرئيسية</h2>
                 </div>
             </div>
-
-            <!-- حاوية بطاقات المؤشرات - يتم إنشاؤها برمجياً عبر الجافاسكربت -->
             <div id="kpi-container" class="kpi-grid" aria-live="polite"></div>
         </section>
 
-        <!-- قسم الرسوم البيانية (Charts) -->
+        <!-- قسم الرسوم البيانية -->
         <section class="charts-section">
 
-            <!-- الرسم البياني الأول: تصنيف التعديات (دونات) -->
+            <!-- الرسم البياني الأول: تصنيف التعديات -->
             <div class="chart-card">
                 <div class="chart-header">
                     <div>
@@ -76,15 +66,14 @@
                     <canvas id="encroachmentsChart"></canvas>
                     <div class="chart-center">
                         <strong id="chart-total">0</strong>
-                        <span> تعدي</span>
+                        <span>تعدي</span>
                     </div>
                 </div>
-                <!-- حاوية تفاصيل التصنيف الجديدة -->
+                <!-- تفاصيل التصنيف -->
                 <div id="encroachments-legend-details" class="chart-details-grid"></div>
-                </div>
             </div>
 
-            <!-- الرسم البياني الثاني: حالة التعدي (دونات) -->
+            <!-- الرسم البياني الثاني: حالة التعدي -->
             <div class="chart-card">
                 <div class="chart-header">
                     <div>
@@ -92,36 +81,46 @@
                     </div>
                     <button class="reset-filter">إزالة الفلتر</button>
                 </div>
+
                 <div class="chart-wrapper">
                     <canvas id="statusChart"></canvas>
                     <div class="chart-center">
                         <strong id="status-total">0</strong>
-                        <span>حالة التعدي</span>
+                        <span>تعدي</span>
                     </div>
                 </div>
+                <!-- تفاصيل حالة التعدي -->
+                <div id="status-legend-details" class="chart-details-grid"></div>
             </div>
 
-            <!-- الرسم البياني الثالث: حالة القضية (قيد الإعداد) -->
-            <div class="chart-card">
-                <div class="chart-header">
-                    <div>
-                        <h2>حالة القضية</h2>
-                        <p>سيتم إضافته لاحقاً</p>
-                    </div>
-                </div>
-                <div class="chart-placeholder">
-                    قريباً
-                </div>
-            </div>
+            <!-- الرسم البياني الثالث: حالة القضية -->
+           <!-- دونات حالة القضية -->
+<div class="chart-card">
+  <div class="chart-header">
+    <div>
+      <h2>حالة القضية</h2>
+    </div>
+    <button class="reset-filter">إزالة الفلتر</button>
+  </div>
+
+  <div class="chart-wrapper">
+    <canvas id="caseChart"></canvas>
+    <div class="chart-center">
+      <strong id="case-total">0</strong>
+      <span>حالة القضية</span>
+    </div>
+  </div>
+
+  <!-- حاوية تفاصيل حالة القضية -->
+  <div id="case-legend-details" class="chart-details-grid"></div>
+</div>
 
         </section>
 
-        <!-- ملاحظات وتنبيهات التحميل -->
         <p id="load-error" class="load-error" role="alert" hidden></p>
 
     </main>
 
-    <!-- مكتبة الرسم البياني Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>

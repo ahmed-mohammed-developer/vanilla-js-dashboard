@@ -59,6 +59,7 @@ function refreshDashboard(records) {
   renderKpis(records);
   renderDonutChart(records);
   renderStatusChart(records);
+  renderCaseChart(records);
 }
 // نهاية الدالة
 
@@ -85,77 +86,7 @@ function calculateKpis(records) {
 // نهاية الدالة
 
 /**
- * دالة إنشاء وتحديث رسم حالة التعدي (Donut Chart)
- * بداية الدالة
- */
-function renderStatusChart(records) {
-  const statusCounts = {};
-
-  records.forEach(record => {
-    const status = normalize(record["حالة_التعدي"]) || "غير محدد";
-    statusCounts[status] = (statusCounts[status] || 0) + 1;
-  });
-
-  const labels = Object.keys(statusCounts);
-  const values = Object.values(statusCounts);
-  const totalElement = document.getElementById("status-total");
-
-  if (totalElement) {
-    totalElement.textContent = records.length;
-  }
-
-  const colors = ["#00778B", "#71B2C9", "#16856B", "#CB2C30", "#F1B434", "#768692", "#8A6BBE"];
-  const canvas = document.getElementById("statusChart");
-  if (!canvas) return;
-
-  const ctx = canvas.getContext("2d");
-  if (statusChart) statusChart.destroy();
-
-  statusChart = new Chart(ctx, {
-    type: "doughnut",
-    data: {
-      labels,
-      datasets: [{
-        data: values,
-        backgroundColor: colors.slice(0, labels.length),
-        borderColor: "#FFFFFF",
-        borderWidth: 3
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: "50%",
-      plugins: {
-        legend: { position: "bottom" },
-        tooltip: {
-          callbacks: {
-            label(context) {
-              const total = context.dataset.data.reduce((a, b) => a + b, 0);
-              const value = context.raw;
-              const percent = ((value / total) * 100).toFixed(1);
-              return `${context.label}: ${value} (${percent}%)`;
-            }
-          }
-        }
-      },
-      onClick(event, elements) {
-        if (!elements.length) return;
-        const selectedStatus = labels[elements[0].index];
-        const filteredRecords = originalRecords.filter(r => normalize(r["حالة_التعدي"]) === selectedStatus);
-        refreshDashboard(filteredRecords);
-      }
-    }
-  });
-}
-// نهاية الدالة
-
-/**
- * دالة إنشاء وتحديث رسم تصنيف التعديات (عقود منتهية مقابل وضع يد)
- * بداية الدالة
- */
-/**
- * دالة إنشاء وتحديث رسم تصنيف التعديات (عقود منتهية مقابل وضع يد) مع عرض التفاصيل
+ * دالة إنشاء وتحديث رسم تصنيف التعديات مع الكاردات الخاصة بها
  * بداية الدالة
  */
 function renderDonutChart(records) {
@@ -171,13 +102,11 @@ function renderDonutChart(records) {
   const total = records.length;
   if (totalElement) totalElement.textContent = total;
 
-  // تجهيز البيانات والنسب المئوية
   const dataDetails = [
     { label: "وضع اليد", count: handRecords.length, color: "#CB2C30", records: handRecords },
     { label: "العقود المنتهية", count: expiredRecords.length, color: "#768692", records: expiredRecords }
   ];
 
-  // توليد كاردات التفاصيل HTML تلقائياً
   if (detailsContainer) {
     detailsContainer.innerHTML = dataDetails.map(item => {
       const percent = total > 0 ? ((item.count / total) * 100).toFixed(1) : 0;
@@ -213,7 +142,7 @@ function renderDonutChart(records) {
       maintainAspectRatio: false,
       cutout: "55%",
       plugins: {
-        legend: { display: false }, // قمنا بإلغاء الليجند الافتراضي لأننا صنعنا كاردات مخصصة بدلاً منه
+        legend: { display: false },
         tooltip: {
           callbacks: {
             label(context) {
@@ -233,7 +162,333 @@ function renderDonutChart(records) {
   });
 }
 // نهاية الدالة
+
+/**
+ * دالة إنشاء وتحديث رسم حالة التعدي مع الكاردات الخاصة بها
+ * بداية الدالة
+ */
+/**
+ * دالة إنشاء وتحديث رسم حالة التعدي مع عرض التفاصيل مرتبة من الأكبر إلى الأصغر
+ * بداية الدالة
+ */
+/**
+ * دالة إنشاء وتحديث رسم حالة التعدي مع الحفاظ على ثبات الألوان والترتيب بعد التصفية
+ * بداية الدالة
+ */
+/**
+ 
+/**
+ * إنشاء وتحديث رسم حالات التعدي
+ * مع تثبيت لون كل حالة وترتيبها من الأكبر إلى الأصغر
+ */
+
+
+/**
+ * دالة إنشاء وتحديث رسم حالة التعدي مع ربط لون ثابت ومحدد لكل حالة
+ * بداية الدالة
+ */
+function renderStatusChart(records) {
+  const statusCounts = {};
+
+  // تجميع السجلات حسب حالة التعدي
+  records.forEach(record => {
+    const status = normalize(record["حالة_التعدي"]) || "غير محدد";
+    statusCounts[status] = (statusCounts[status] || 0) + 1;
+  });
+
+  // ترتيب الحالات من الأكبر إلى الأصغر
+  const sortedEntries = Object.entries(statusCounts)
+    .sort((a, b) => b[1] - a[1]);
+
+  const labels = sortedEntries.map(entry => entry[0]);
+  const values = sortedEntries.map(entry => entry[1]);
+  const total = records.length;
+
+  /**
+   * جدول ربط الألوان الثابتة: قم بتعديل الألوان هنا حسب رغبتك لكل حالة
+   */
+  const colorMapping = {
+    "قائم": "#A7C8CE",          // أحمر
+    "تم الاخلاء": "#00778B",     // أخضر (احتمال اختلاف الهمزة)
+    "لدى القانونية": "#174A5B", // بنفسجي
+    "لدى القانونية قبل اللجنة": "#648F9A",         // رمادي
+    "تحت إجراءات الإستلام": "#25A6B7"       // أصفر
+  };
+
+  // مصفوفة ألوان احتياطية في حال ظهرت حالة جديدة غير موجودة في الجدول أعلاه
+  const fallbackColors = [
+    "#00778B",
+    "#174A5B",
+    "#A7C8CE",
+    "#648F9A",
+    "#25A6B7",
+    "#16856B"
+  ];
+
+  // إعطاء لون ثابت لكل حالة بناءً على اسمها، وإذا لم توجد يُأخذ لها لون احتياطي بالترتيب
+  const chartColors = labels.map((label, index) => {
+    return colorMapping[label] || fallbackColors[index % fallbackColors.length];
+  });
+
+  // تحديث إجمالي الحالات
+  const totalElement = document.getElementById("status-total");
+
+  if (totalElement) {
+    totalElement.textContent = total;
+  }
+
+  // تحديث تفاصيل الشارت (الكاردات السفلية)
+  const detailsContainer = document.getElementById(
+    "status-legend-details"
+  );
+
+  if (detailsContainer) {
+    detailsContainer.innerHTML = labels.map((label, index) => {
+      const count = values[index];
+      const percent = total > 0
+        ? ((count / total) * 100).toFixed(1)
+        : "0.0";
+
+      return `
+        <div class="chart-detail-item">
+          <div class="chart-detail-info">
+            <span
+              class="chart-detail-color"
+              style="background-color: ${chartColors[index]};"
+            ></span>
+            <span class="chart-detail-label">${label}</span>
+          </div>
+          <span class="chart-detail-stats">
+            ${count} (${percent}%)
+          </span>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // إنشاء الشارت
+  const canvas = document.getElementById("statusChart");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+
+  if (statusChart) {
+    statusChart.destroy();
+  }
+
+  statusChart = new Chart(ctx, {
+    type: "doughnut",
+
+    data: {
+      labels: labels,
+      datasets: [{
+        data: values,
+        backgroundColor: chartColors,
+        hoverBackgroundColor: chartColors,
+        borderColor: "#FFFFFF",
+        borderWidth: 4,
+        hoverOffset: 12
+      }]
+    },
+
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: "55%",
+
+      plugins: {
+        legend: {
+          display: false
+        },
+
+        tooltip: {
+          callbacks: {
+            label(context) {
+              const value = context.raw;
+              const percent = total > 0
+                ? ((value / total) * 100).toFixed(1)
+                : "0.0";
+
+              return `${context.label}: ${value} (${percent}%)`;
+            }
+          }
+        }
+      },
+
+      onClick(event, elements) {
+        if (!elements.length) return;
+
+        const selectedStatus = labels[elements[0].index];
+
+        const filteredRecords = originalRecords.filter(record => {
+          const status =
+            normalize(record["حالة_التعدي"]) || "غير محدد";
+
+          return status === selectedStatus;
+        });
+
+        refreshDashboard(filteredRecords);
+      }
+    }
+  });
+}
 // نهاية الدالة
+
+// متغير عام لحفظ حالة شارت القضايا
+let caseChart = null;
+
+/**
+ * دالة إنشاء وتحديث رسم حالة القضية مع ربط ألوان ثابتة وتفاصيل الكاردات
+ * بداية الدالة
+ */
+/**
+ * دالة إنشاء وتحديث رسم حالة القضية للحведе فقط على السجلات التي تحتوي على حالة قضية
+ * بداية الدالة
+ */
+function renderCaseChart(records) {
+  const caseCounts = {};
+
+  // تجميع السجلات حسب حالة القضية، وتجاهل السجلات التي لا تحتوي على قيمة
+  records.forEach(record => {
+    const caseStatus = normalize(record["حالة_القضية"]);
+    
+    // إذا لم تكن هناك قيمة مسجلة في حالة القضية، يتم تخطي هذا السجل تماماً
+    if (!caseStatus) return;
+
+    caseCounts[caseStatus] = (caseCounts[caseStatus] || 0) + 1;
+  });
+
+  // ترتيب الحالات من الأكبر إلى الأصغر تنازلياً
+  const sortedEntries = Object.entries(caseCounts)
+    .sort((a, b) => b[1] - a[1]);
+
+  const labels = sortedEntries.map(entry => entry[0]);
+  const values = sortedEntries.map(entry => entry[1]);
+  
+  // إجمالي السجلات التي تحتوي على حالات قضايا فقط
+  const total = values.reduce((sum, val) => sum + val, 0);
+
+  /**
+   * جدول ربط الألوان الثابتة لحالة القضية
+   */
+  const colorMapping = {
+    "حكم نهائي": "#00778B",     // أخضر
+    "قضية منظورة": "#A3C6CC",  // أصفر / تحذيري
+    "حكم ابتدائي": "#20A4B8"    // لون سار الأساسي
+  };
+
+  // مصفوفة ألوان احتياطية في حال ظهرت حالة جديدة
+  const fallbackColors = [
+    "#00778B",
+    "#A3C6CC",
+    "#20A4B8",
+  ];
+
+  // إعطاء لون ثابت لكل حالة بناءً على اسمها
+  const chartColors = labels.map((label, index) => {
+    return colorMapping[label] || fallbackColors[index % fallbackColors.length];
+  });
+
+  // تحديث إجمالي الحالات في منتصف الشارت
+  const totalElement = document.getElementById("case-total");
+  if (totalElement) {
+    totalElement.textContent = total;
+  }
+
+  // تحديث تفاصيل الشارت (الكاردات السفلية)
+  const detailsContainer = document.getElementById("case-legend-details");
+  if (detailsContainer) {
+    detailsContainer.innerHTML = labels.map((label, index) => {
+      const count = values[index];
+      const percent = total > 0
+        ? ((count / total) * 100).toFixed(1)
+        : "0.0";
+
+      return `
+        <div class="chart-detail-item">
+          <div class="chart-detail-info">
+            <span
+              class="chart-detail-color"
+              style="background-color: ${chartColors[index]};"
+            ></span>
+            <span class="chart-detail-label">${label}</span>
+          </div>
+          <span class="chart-detail-stats">
+            ${count} (${percent}%)
+          </span>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // إنشاء الشارت باستخدام مكتبة Chart.js
+  const canvas = document.getElementById("caseChart");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+
+  if (caseChart) {
+    caseChart.destroy();
+  }
+
+  caseChart = new Chart(ctx, {
+    type: "doughnut",
+
+    data: {
+      labels: labels,
+      datasets: [{
+        data: values,
+        backgroundColor: chartColors,
+        hoverBackgroundColor: chartColors,
+        borderColor: "#FFFFFF",
+        borderWidth: 4,
+        hoverOffset: 12
+      }]
+    },
+
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: "55%",
+
+      plugins: {
+        legend: {
+          display: false
+        },
+
+        tooltip: {
+          callbacks: {
+            label(context) {
+              const value = context.raw;
+              const percent = total > 0
+                ? ((value / total) * 100).toFixed(1)
+                : "0.0";
+
+              return `${context.label}: ${value} (${percent}%)`;
+            }
+          }
+        }
+      },
+
+      onClick(event, elements) {
+        if (!elements.length) return;
+
+        const selectedStatus = labels[elements[0].index];
+
+        // التصفية بناءً على الحالات الموجودة فعلياً
+        const filteredRecords = originalRecords.filter(record => {
+          const status = normalize(record["حالة_القضية"]);
+          return status === selectedStatus;
+        });
+
+        refreshDashboard(filteredRecords);
+      }
+    }
+  });
+}
+// نهاية الدالة
+// نهاية الدالة
+
 
 /**
  * دالة طباعة وبناء بطاقات مؤشرات الأداء الرئيسية في الواجهة
@@ -244,7 +499,6 @@ function renderKpis(records) {
   const formatter = new Intl.NumberFormat("en-US");
   const kpis = calculateKpis(records);
 
-  // تم حذف تذييل البطاقة (.kpi-foot) بالكامل من قالب HTML الخاص بالبطاقات
   container.innerHTML = kpis.map(kpi => `
     <div class="kpi-card" style="--accent:${kpi.color}">
       <span class="kpi-card-top">
@@ -254,7 +508,8 @@ function renderKpis(records) {
       <strong class="kpi-value" dir="ltr">${formatter.format(kpi.value)}</strong>
     </div>
   `).join("");
-}// نهاية الدالة
+}
+// نهاية الدالة
 
 /**
  * دالة تهيئة وتحميل بيانات النظام من ملف JSON الخارجي

@@ -1,15 +1,17 @@
 /**
- * مؤشرات التعديات
- * يتوقع أن يكون encroachments.json في نفس مجلد هذا الملف.
- * التشغيل عبر Live Server أو خادم محلي مطلوب لأن fetch لا يعمل عادةً مع file://.
+ * مؤشرات وتحليلات التعديات العقارية
+ * يتطلب وجود ملف encroachments.json في مجلد البيانات (data).
  */
 
 const DATA_URL = "./data/encroachments.json";
+
+// متغيرات عامة لحفظ حالة الرسوم البيانية والسجلات
 let donutChart = null;
 let statusChart = null;
 let originalRecords = [];
 let currentRecords = [];
 
+// تعريف الرموز الرسومية (SVG Icons) للمؤشرات
 const icons = {
   total: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 1 4 16.5z"/><path d="M4 16a2.5 2.5 0 0 1 2.5-2.5H20M8 7h8M8 10h5"/></svg>',
   hand: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M8 11V5a1.5 1.5 0 0 1 3 0v5-6a1.5 1.5 0 0 1 3 0v6-4a1.5 1.5 0 0 1 3 0v6l1-1a1.8 1.8 0 0 1 3 1.4l-1 5.1A5 5 0 0 1 15.1 22h-2.4a5 5 0 0 1-3.8-1.8L4 14.5a1.8 1.8 0 0 1 2.7-2.4L8 13.5"/></svg>',
@@ -25,209 +27,98 @@ const icons = {
   pending: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'
 };
 
+/**
+ * دالة مساعدة: حساب عدد السجلات المطابقة لشرط معين
+ * بداية الدالة
+ */
 const countWhere = (records, predicate) => records.filter(predicate).length;
+// نهاية الدالة
 
-const hasValue = value =>
-  value !== null &&
-  value !== undefined &&
-  String(value).trim() !== "";
+/**
+ * دالة مساعدة: التحقق من وجود قيمة صالحة غير فارغة
+ * بداية الدالة
+ */
+const hasValue = value => value !== null && value !== undefined && String(value).trim() !== "";
+// نهاية الدالة
 
+/**
+ * دالة تطبيع النصوص (توحيد المسافات وإزالة الفراغات الزائدة)
+ * بداية الدالة
+ */
+function normalize(value) {
+  return String(value ?? "").trim().replace(/\s+/g, " ");
+}
+// نهاية الدالة
+
+/**
+ * دالة تحديث اللوحة بالكامل (المؤشرات والرسوم البيانية)
+ * بداية الدالة
+ */
 function refreshDashboard(records) {
   currentRecords = records;
   renderKpis(records);
   renderDonutChart(records);
   renderStatusChart(records);
 }
+// نهاية الدالة
 
-function normalize(value) {
-  return String(value ?? "")
-    .trim()
-    .replace(/\s+/g, " ");
-}
-
+/**
+ * دالة حساب مؤشرات الأداء الرئيسية (KPIs) بناءً على قواعد البيانات
+ * بداية الدالة
+ */
 function calculateKpis(records) {
-  const expired = r =>
-    normalize(r["التصنيف"]) === "عقد منتهى";
-
-  const handPossession = r =>
-    normalize(r["التصنيف"]) === "وضع يد";
-
-  const evicted = r =>
-    ["تم الاخلاء", "تم الإخلاء"].includes(
-      normalize(r["حالة_التعدي"])
-    );
-
-  const finalJudgment = r =>
-    normalize(r["حالة_القضية"]) === "حكم نهائي";
-
-  const initialJudgment = r =>
-    normalize(r["حالة_القضية"]) === "حكم ابتدائي";
-
-  const pendingCase = r =>
-    normalize(r["حالة_القضية"]) === "قضية منظورة";
-
-  const rentalIncident = r =>
-    hasValue(r["رقم_الواقعة_الإيجارية"]);
-
-  const lawsuit = r =>
-    hasValue(r["رقم_الدعوى_القضائية"]) ||
-    hasValue(r["رقم_صك_الدعوى"]) ||
-    finalJudgment(r) ||
-    initialJudgment(r) ||
-    pendingCase(r);
+  const expired = r => normalize(r["التصنيف"]) === "عقد منتهى";
+  const handPossession = r => normalize(r["التصنيف"]) === "وضع يد";
+  const evicted = r => ["تم الاخلاء", "تم الإخلاء"].includes(normalize(r["حالة_التعدي"]));
+  const finalJudgment = r => normalize(r["حالة_القضية"]) === "حكم نهائي";
+  const initialJudgment = r => normalize(r["حالة_القضية"]) === "حكم ابتدائي";
+  const pendingCase = r => normalize(r["حالة_القضية"]) === "قضية منظورة";
+  const rentalIncident = r => hasValue(r["رقم_الواقعة_الإيجارية"]);
+  const lawsuit = r => hasValue(r["رقم_الدعوى_القضائية"]) || hasValue(r["رقم_صك_الدعوى"]) || finalJudgment(r) || initialJudgment(r) || pendingCase(r);
 
   return [
-    {
-      id: "total",
-      label: "إجمالي التعديات",
-      value: records.length,
-      icon: "total",
-      color: "#00778B",
-      detail: "عدد السجلات في قاعدة البيانات."
-    },
-    {
-      id: "expired",
-      label: "العقود المنتهية",
-      value: countWhere(records, expired),
-      icon: "contract",
-      color: "#71B2C9",
-      detail: "السجلات المصنفة عقد منتهى."
-    },
-    {
-      id: "hand",
-      label: "تعديات وضع اليد",
-      value: countWhere(records, handPossession),
-      icon: "hand",
-      color: "#768692",
-      detail: "السجلات المصنفة وضع يد."
-    },
-    {
-      id: "evicted",
-      label: "تم الإخلاء",
-      value: countWhere(records, evicted),
-      icon: "check",
-      color: "#16856B",
-      detail: "السجلات التي تم إخلاؤها."
-    },
-    {
-      id: "active",
-      label: "التعديات القائمة",
-      value: countWhere(
-        records,
-        r => normalize(r["حالة_التعدي"]) === "قائم"
-      ),
-      icon: "active",
-      color: "#CB2C30",
-      detail: "التعديات التي مازالت قائمة."
-    },
-    {
-      id: "legal",
-      label: "لدى القانونية",
-      value: countWhere(
-        records,
-        r => normalize(r["حالة_التعدي"]) === "لدى القانونية"
-      ),
-      icon: "legal",
-      color: "#8A6BBE",
-      detail: "التعديات المحالة للإدارة القانونية."
-    },
-    {
-      id: "cities",
-      label: "عدد المدن",
-      value: new Set(
-        records
-          .map(r => normalize(r["المدينة"]))
-          .filter(Boolean)
-      ).size,
-      icon: "city",
-      color: "#00778B",
-      detail: "عدد المدن المختلفة."
-    },
-    {
-      id: "incidents",
-      label: "وقائع إيجارية",
-      value: countWhere(records, rentalIncident),
-      icon: "incident",
-      color: "#C18B20",
-      detail: "السجلات التي لها واقعة إيجارية."
-    },
-    {
-      id: "lawsuits",
-      label: "رُفعت عليها قضايا",
-      value: countWhere(records, lawsuit),
-      icon: "case",
-      color: "#5B78B7",
-      detail: "السجلات المرتبطة بقضية أو صك."
-    },
-    {
-      id: "final",
-      label: "أحكام نهائية",
-      value: countWhere(records, finalJudgment),
-      icon: "final",
-      color: "#16856B",
-      detail: "القضايا ذات الحكم النهائي."
-    },
-    {
-      id: "initial",
-      label: "أحكام ابتدائية",
-      value: countWhere(records, initialJudgment),
-      icon: "initial",
-      color: "#D18A35",
-      detail: "القضايا ذات الحكم الابتدائي."
-    },
-    {
-      id: "pending",
-      label: "قضايا منظورة",
-      value: countWhere(records, pendingCase),
-      icon: "pending",
-      color: "#CB2C30",
-      detail: "القضايا المنظورة حالياً."
-    }
+    { id: "total", label: "إجمالي التعديات", value: records.length, icon: "total", color: "#00778B", detail: "عدد السجلات في قاعدة البيانات." },
+    { id: "expired", label: "العقود المنتهية", value: countWhere(records, expired), icon: "contract", color: "#71B2C9", detail: "السجلات المصنفة عقد منتهى." },
+    { id: "hand", label: "تعديات وضع اليد", value: countWhere(records, handPossession), icon: "hand", color: "#768692", detail: "السجلات المصنفة وضع يد." },
+    { id: "evicted", label: "تم الإخلاء", value: countWhere(records, evicted), icon: "check", color: "#16856B", detail: "السجلات التي تم إخلاؤها." },
+    { id: "active", label: "التعديات القائمة", value: countWhere(records, r => normalize(r["حالة_التعدي"]) === "قائم"), icon: "active", color: "#CB2C30", detail: "التعديات التي مازالت قائمة." },
+    { id: "legal", label: "لدى القانونية", value: countWhere(records, r => normalize(r["حالة_التعدي"]) === "لدى القانونية"), icon: "legal", color: "#8A6BBE", detail: "التعديات المحالة للإدارة القانونية." },
+    { id: "cities", label: "عدد المدن", value: new Set(records.map(r => normalize(r["المدينة"])).filter(Boolean)).size, icon: "city", color: "#00778B", detail: "عدد المدن المختلفة." },
+    { id: "incidents", label: "وقائع إيجارية", value: countWhere(records, rentalIncident), icon: "incident", color: "#C18B20", detail: "السجلات التي لها واقعة إيجارية." },
+    { id: "lawsuits", label: "رُفعت عليها قضايا", value: countWhere(records, lawsuit), icon: "case", color: "#5B78B7", detail: "السجلات المرتبطة بقضية أو صك." },
+    { id: "final", label: "أحكام نهائية", value: countWhere(records, finalJudgment), icon: "final", color: "#16856B", detail: "القضايا ذات الحكم النهائي." },
+    { id: "initial", label: "أحكام ابتدائية", value: countWhere(records, initialJudgment), icon: "initial", color: "#D18A35", detail: "القضايا ذات الحكم الابتدائي." },
+    { id: "pending", label: "قضايا منظورة", value: countWhere(records, pendingCase), icon: "pending", color: "#CB2C30", detail: "القضايا المنظورة حالياً." }
   ];
 }
+// نهاية الدالة
 
+/**
+ * دالة إنشاء وتحديث رسم حالة التعدي (Donut Chart)
+ * بداية الدالة
+ */
 function renderStatusChart(records) {
   const statusCounts = {};
 
   records.forEach(record => {
-    const status =
-      normalize(record["حالة_التعدي"]) ||
-      "غير محدد";
-
-    statusCounts[status] =
-      (statusCounts[status] || 0) + 1;
+    const status = normalize(record["حالة_التعدي"]) || "غير محدد";
+    statusCounts[status] = (statusCounts[status] || 0) + 1;
   });
 
   const labels = Object.keys(statusCounts);
   const values = Object.values(statusCounts);
-
-  const totalElement =
-    document.getElementById("status-total");
+  const totalElement = document.getElementById("status-total");
 
   if (totalElement) {
     totalElement.textContent = records.length;
   }
 
-  const colors = [
-    "#00778B",
-    "#71B2C9",
-    "#16856B",
-    "#CB2C30",
-    "#F1B434",
-    "#768692",
-    "#8A6BBE"
-  ];
-
-  const canvas =
-    document.getElementById("statusChart");
-
+  const colors = ["#00778B", "#71B2C9", "#16856B", "#CB2C30", "#F1B434", "#768692", "#8A6BBE"];
+  const canvas = document.getElementById("statusChart");
   if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
-
-  if (statusChart) {
-    statusChart.destroy();
-  }
+  if (statusChart) statusChart.destroy();
 
   statusChart = new Chart(ctx, {
     type: "doughnut",
@@ -245,25 +136,13 @@ function renderStatusChart(records) {
       maintainAspectRatio: false,
       cutout: "50%",
       plugins: {
-        legend: {
-          position: "bottom"
-        },
+        legend: { position: "bottom" },
         tooltip: {
           callbacks: {
             label(context) {
-              const total =
-                context.dataset.data.reduce(
-                  (a, b) => a + b,
-                  0
-                );
-
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
               const value = context.raw;
-
-              const percent =
-                (
-                  (value / total) * 100
-                ).toFixed(1);
-
+              const percent = ((value / total) * 100).toFixed(1);
               return `${context.label}: ${value} (${percent}%)`;
             }
           }
@@ -271,72 +150,39 @@ function renderStatusChart(records) {
       },
       onClick(event, elements) {
         if (!elements.length) return;
-
-        const selectedStatus =
-          labels[elements[0].index];
-
-        const filteredRecords =
-          originalRecords.filter(
-            r =>
-              normalize(
-                r["حالة_التعدي"]
-              ) === selectedStatus
-          );
-
+        const selectedStatus = labels[elements[0].index];
+        const filteredRecords = originalRecords.filter(r => normalize(r["حالة_التعدي"]) === selectedStatus);
         refreshDashboard(filteredRecords);
-
-        document.getElementById(
-          "active-filter"
-        ).textContent =
-          `التصفية الحالية: ${selectedStatus}`;
       }
     }
   });
 }
+// نهاية الدالة
 
+/**
+ * دالة إنشاء وتحديث رسم تصنيف التعديات (عقود منتهية مقابل وضع يد)
+ * بداية الدالة
+ */
 function renderDonutChart(records) {
-  const expiredRecords = records.filter(
-    r => normalize(r["التصنيف"]) === "عقد منتهى"
-  );
+  const expiredRecords = records.filter(r => normalize(r["التصنيف"]) === "عقد منتهى");
+  const handRecords = records.filter(r => normalize(r["التصنيف"]) === "وضع يد");
 
-  const handRecords = records.filter(
-    r => normalize(r["التصنيف"]) === "وضع يد"
-  );
-
-  const totalElement =
-    document.getElementById("chart-total");
-
-  const chartCanvas =
-    document.getElementById("encroachmentsChart");
-
+  const totalElement = document.getElementById("chart-total");
+  const chartCanvas = document.getElementById("encroachmentsChart");
   if (!chartCanvas) return;
 
-  if (totalElement) {
-    totalElement.textContent = records.length;
-  }
+  if (totalElement) totalElement.textContent = records.length;
 
   const ctx = chartCanvas.getContext("2d");
-
-  if (donutChart) {
-    donutChart.destroy();
-  }
+  if (donutChart) donutChart.destroy();
 
   donutChart = new Chart(ctx, {
     type: "doughnut",
     data: {
-      labels: [
-        "العقود المنتهية",
-        "وضع اليد"
-      ],
+      labels: ["العقود المنتهية", "وضع اليد"],
       datasets: [{
-        data: [
-          expiredRecords.length,
-          handRecords.length
-        ],
-        backgroundColor: [
-          "#00778B",
-          "#71B2C9"
-        ],
+        data: [expiredRecords.length, handRecords.length],
+        backgroundColor: ["#00778B", "#71B2C9"],
         borderColor: "#FFFFFF",
         borderWidth: 4,
         hoverOffset: 12
@@ -349,29 +195,14 @@ function renderDonutChart(records) {
       plugins: {
         legend: {
           position: "bottom",
-          labels: {
-            usePointStyle: true,
-            font: {
-              family: "IBM Plex Sans Arabic",
-              size: 13
-            }
-          }
+          labels: { usePointStyle: true, font: { family: "IBM Plex Sans Arabic", size: 13 } }
         },
         tooltip: {
           callbacks: {
             label(context) {
-              const total =
-                context.dataset.data.reduce(
-                  (a, b) => a + b,
-                  0
-                );
-
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
               const value = context.raw;
-
-              const percent =
-                ((value / total) * 100)
-                  .toFixed(1);
-
+              const percent = ((value / total) * 100).toFixed(1);
               return `${context.label}: ${value} (${percent}%)`;
             }
           }
@@ -379,49 +210,33 @@ function renderDonutChart(records) {
       },
       onClick(event, elements) {
         if (!elements.length) return;
-
         const index = elements[0].index;
-
-        if (index === 0) {
-          refreshDashboard(expiredRecords);
-          document.getElementById("active-filter")
-            .textContent =
-            "التصفية الحالية: العقود المنتهية";
-        }
-
-        if (index === 1) {
-          refreshDashboard(handRecords);
-          document.getElementById("active-filter")
-            .textContent =
-            "التصفية الحالية: وضع اليد";
-        }
+        if (index === 0) refreshDashboard(expiredRecords);
+        if (index === 1) refreshDashboard(handRecords);
       }
     }
   });
 }
+// نهاية الدالة
 
+/**
+ * دالة طباعة وبناء بطاقات مؤشرات الأداء الرئيسية في الواجهة
+ * بداية الدالة
+ */
 function renderKpis(records) {
   const container = document.getElementById("kpi-container");
   const countLabel = document.getElementById("record-count");
-  const note = document.getElementById("data-note");
-
   const formatter = new Intl.NumberFormat("en-US");
   const kpis = calculateKpis(records);
 
-  countLabel.textContent =
-    `${formatter.format(records.length)} سجل`;
 
   container.innerHTML = kpis.map(kpi => `
-    <button class="kpi-card" type="button"
-      style="--accent:${kpi.color}"
-      aria-label="${kpi.label}: ${kpi.value}">
+    <button class="kpi-card" type="button" style="--accent:${kpi.color}" aria-label="${kpi.label}: ${kpi.value}">
       <span class="kpi-card-top">
         <span class="kpi-label">${kpi.label}</span>
         <span class="kpi-icon">${icons[kpi.icon]}</span>
       </span>
-      <strong class="kpi-value" dir="ltr">
-        ${formatter.format(kpi.value)}
-      </strong>
+      <strong class="kpi-value" dir="ltr">${formatter.format(kpi.value)}</strong>
       <span class="kpi-foot">
         <span>تفاصيل المؤشر</span>
         <span class="more">عرض التوضيح ←</span>
@@ -429,72 +244,52 @@ function renderKpis(records) {
     </button>
   `).join("");
 
-  [...container.querySelectorAll(".kpi-card")]
-    .forEach((button, index) => {
-      button.addEventListener("click", () => {
-        const kpi = kpis[index];
-
-        alert(
-`${kpi.label}
-العدد: ${formatter.format(kpi.value)}
-
-طريقة الاحتساب:
-${kpi.detail}`
-        );
-      });
+  // ربط أحداث النقر لعرض تفاصيل المؤشر عند الضغط على البطاقة
+  [...container.querySelectorAll(".kpi-card")].forEach((button, index) => {
+    button.addEventListener("click", () => {
+      const kpi = kpis[index];
+      alert(`${kpi.label}\nالعدد: ${formatter.format(kpi.value)}\n\nطريقة الاحتساب:\n${kpi.detail}`);
     });
+  });
 
-  note.hidden = false;
-  note.textContent =
-    `يتم تحديث هذه المؤشرات بشكل يومي بناءً على البيانات الواردة والمعتمدة. العدد الحالي للسجلات هو ${records.length} سجلًا، منها ${
-      kpis.find(k => k.id === "expired").value
-    } عقدًا منتهيًا و${
-      kpis.find(k => k.id === "hand").value
-    } حالة وضع يد.`;
 }
+// نهاية الدالة
 
+/**
+ * دالة تهيئة وتحميل بيانات النظام من ملف JSON الخارجي
+ * بداية الدالة
+ */
 async function initKpis() {
   const errorBox = document.getElementById("load-error");
 
   try {
     const response = await fetch(DATA_URL);
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
     const records = await response.json();
-
-    if (!Array.isArray(records)) {
-      throw new Error("تنسيق الملف يجب أن يكون JSON Array.");
-    }
+    if (!Array.isArray(records)) throw new Error("تنسيق الملف يجب أن يكون JSON Array.");
 
     originalRecords = [...records];
     currentRecords = [...records];
 
-    renderKpis(currentRecords);
-    renderDonutChart(currentRecords);
-    renderStatusChart(currentRecords);
+    refreshDashboard(currentRecords);
 
   } catch (error) {
     errorBox.hidden = false;
-    errorBox.textContent =
-      "تعذر تحميل ملف البيانات: " +
-      error.message;
-
-    document.getElementById("record-count")
-      .textContent = "تعذر التحميل";
+    errorBox.textContent = "تعذر تحميل ملف البيانات: " + error.message;
   }
 }
+// نهاية الدالة
 
+/**
+ * مستمع الأحداث العام لإعادة تعيين الفلترة عند الضغط على زر التصفية
+ * بداية الاستماع
+ */
 document.addEventListener("click", (e) => {
-  if (!e.target.classList.contains("reset-filter"))
-    return;
-
+  if (!e.target.classList.contains("reset-filter")) return;
   refreshDashboard(originalRecords);
-
-  document.getElementById("active-filter")
-    .textContent = "عرض جميع البيانات";
 });
+// نهاية الاستماع
 
+// تشغيل النظام عند التحميل
 initKpis();

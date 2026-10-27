@@ -208,7 +208,38 @@ button, a {
   box-shadow: var(--shadow-card);
   padding: 20px;
 }
+.charts-section2{
+  margin-top: 15px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+}
+.card-legal {
+  display: grid;
+  /* الشاشات الكبيرة والمتوسطة: عمودين متساويين في صف واحد */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  border-top: 1px solid var(--color-border);
+  padding-top: 20px;  
+}
 
+/* الشاشات الصغيرة (الجوال): يتحول الكارد ليصبح عموداً واحداً (الجزء الأول وتحته الثاني) */
+@media (max-width: 900px) {
+  .card-legal {
+    grid-template-columns: 1fr;
+  }
+}
+.chart-card-legal{
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+}
 .chart-header {
   display: flex;
   justify-content: space-between;
@@ -332,6 +363,9 @@ button, a {
 @media (min-width: 1200px) {
   .charts-section { grid-template-columns: repeat(3, 1fr); }
 }
+
+
+@media (max-width: 900px) { .charts-section { grid-template-columns: 1fr !important; } }
 
 @media (min-width: 768px) and (max-width: 1199px) {
   .charts-section { grid-template-columns: repeat(2, 1fr); }

@@ -117,6 +117,43 @@
 
         </section>
 
+        <!-- قسم الوقائع الإيجارية (مقسم لجزأين: الشارت + جدول/كاردات التفاصيل) -->
+<section class="charts-section2">
+     <div class="chart-header">
+        <div>
+          <h2>حالة الواقعة الإيجارية</h2>
+        </div>
+        <button class="reset-filter">إزالة الفلتر</button>
+      </div>
+  <!-- كارد رئيسي واحد يضم الجزئين معاً -->
+  <div class="card-legal">
+    <!-- الجزء الأول: دونات حالة الواقعة الإيجارية والشارت -->
+    <div class="chart-card-legal">
+      <div class="chart-wrapper">
+        <canvas id="rentalIncidentChart"></canvas>
+        <div class="chart-center">
+          <strong id="incident-total">0</strong>
+          <span>واقعة إيجارية</span>
+        </div>
+      </div>
+      <div id="incident-legend-details" class="chart-details-grid"></div>
+    </div>
+
+    <!-- الجزء الثاني: كارد/قسم بيانات الوقائع الإيجارية والتفاصيل -->
+    <div class="chart-card-legal">
+      <div class="chart-header">
+        <div>
+        </div>
+      </div>
+      <!-- حاوية عرض السجلات مع التمرير والتعداد الرقمي -->
+      <div id="rental-records-container" style="max-height: 507px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-top: 5px;">
+        <!-- يتم تعبئتها ديناميكياً عبر الجافاسكربت -->
+      </div>
+    </div>
+
+  </div>
+</section>
+
         <p id="load-error" class="load-error" role="alert" hidden></p>
 
     </main>

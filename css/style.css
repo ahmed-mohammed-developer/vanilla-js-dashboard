@@ -1,5 +1,6 @@
 @import url("./navbar.css");
 @import url("./kpis.css");
+@import url("./map.css");
 
 :root {
   --color-primary: #00778B;
@@ -37,6 +38,7 @@ body {
   color: var(--color-text);
   font-family: "Tajawal", sans-serif;
   line-height: 1.7;
+
 }
 
 button,

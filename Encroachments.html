@@ -26,6 +26,7 @@
 
     <title>التعديات | سار</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="js/main.js" type="module" defer></script>
 </head>
 <body>
@@ -154,10 +155,48 @@
   </div>
 </section>
 
+<!-- قسم توزيع التعديات حسب المدن (شارت منفصل مستقل) -->
+<section class="charts-section2" style="margin-top: 30px;">
+  <div class="chart-header">
+    <div>
+      <h2>توزيع التعديات حسب المدن والتصنيفات</h2>
+    </div>
+    <button class="reset-filter" onclick="refreshDashboard(originalRecords)">إزالة الفلتر</button>
+  </div>
+
+  <!-- كارد رئيسي واحد يضم الشارت المستقل وجدول السجلات المقابل -->
+  <div class="card-legal">
+    
+    <!-- الجزء الأول: الشارت المتراكم الخاص بالمدن -->
+    <div class="chart-card-legal">
+      <div class="chart-wrapper" style="position: relative; height: 430px; width: 100%;">
+        <canvas id="cityEncroachmentChart"></canvas>
+      </div>
+      <div id="city-legend-details" class="chart-details-grid" style="margin-top: 15px;"></div>
+    </div>
+
+    <!-- الجزء الثاني: كارد السجلات الخاص بالمدن (التسلسل، المدينة، رقم الأرض، والتصنيف) -->
+    <div class="chart-card-legal">
+      <div class="chart-header">
+        <div>
+          <h3>قائمة السجلات وتفاصيل الأراضي (<span id="city-records-count">0</span>)</h3>
+        </div>
+      </div>
+      
+      <!-- حاوية السجلات مع التمرير -->
+      <div id="city-records-container" style="max-height: 507px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-top: 5px;">
+        <!-- يتم تعبئتها ديناميكياً عبر الجافاسكربت -->
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
         <p id="load-error" class="load-error" role="alert" hidden></p>
 
     </main>
-
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>

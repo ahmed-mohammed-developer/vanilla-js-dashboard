@@ -61,6 +61,7 @@ function refreshDashboard(records) {
   renderStatusChart(records);
   renderCaseChart(records);
   renderRentalIncidentSection(records); // <--- إضافة دالة الوقائع الإيجارية هنا
+  renderCityEncroachmentSection(records)
 }
 // نهاية الدالة
 
@@ -69,9 +70,6 @@ function refreshDashboard(records) {
  * بداية الدالة
  */
 function calculateKpis(records) {
-  const expired = r => normalize(r["التصنيف"]) === "عقد منتهى";
-  const handPossession = r => normalize(r["التصنيف"]) === "وضع يد";
-  const evicted = r => ["تم الاخلاء", "تم الإخلاء"].includes(normalize(r["حالة_التعدي"]));
   const finalJudgment = r => normalize(r["حالة_القضية"]) === "حكم نهائي";
   const initialJudgment = r => normalize(r["حالة_القضية"]) === "حكم ابتدائي";
   const pendingCase = r => normalize(r["حالة_القضية"]) === "قضية منظورة";
@@ -86,10 +84,6 @@ function calculateKpis(records) {
 }
 // نهاية الدالة
 
-/**
- * دالة إنشاء وتحديث رسم تصنيف التعديات مع الكاردات الخاصة بها
- * بداية الدالة
- */
 /**
  * دالة إنشاء وتحديث رسم تصنيف التعديات مع إخفاء التصنيفات التي رصيدها صفر عند الفلترة
  * بداية الدالة
@@ -208,27 +202,6 @@ function renderDonutChart(records) {
   });
 }
 // نهاية الدالة
-// نهاية الدالة
-
-/**
- * دالة إنشاء وتحديث رسم حالة التعدي مع الكاردات الخاصة بها
- * بداية الدالة
- */
-/**
- * دالة إنشاء وتحديث رسم حالة التعدي مع عرض التفاصيل مرتبة من الأكبر إلى الأصغر
- * بداية الدالة
- */
-/**
- * دالة إنشاء وتحديث رسم حالة التعدي مع الحفاظ على ثبات الألوان والترتيب بعد التصفية
- * بداية الدالة
- */
-/**
- 
-/**
- * إنشاء وتحديث رسم حالات التعدي
- * مع تثبيت لون كل حالة وترتيبها من الأكبر إلى الأصغر
- */
-
 
 /**
  * دالة إنشاء وتحديث رسم حالة التعدي مع ربط لون ثابت ومحدد لكل حالة
@@ -696,6 +669,173 @@ function renderRentalIncidentSection(records) {
 }
 // نهاية الدالة
 
+
+let cityEncroachmentChart = null;
+
+/**
+ * دالة مستقلة لإنشاء وتحديث شارت المدن والتعديات (عقد منتهى، وضع يد) والجدول المقابل
+ */
+function renderCityEncroachmentSection(records) {
+  // تصفية السجلات التي تحتوي على مدينة وتصنيف صالحين
+  const validRecords = records.filter(record => {
+    const city = normalize(record["المدينة"]);
+    const classification = normalize(record["التصنيف"]);
+    return city !== "" && classification !== "";
+  });
+
+  // تجميع البيانات حسب المدينة والتصنيف
+  const cityClassificationMap = {};
+  const allClassificationsSet = new Set();
+
+  validRecords.forEach(record => {
+    const city = String(record["المدينة"]).trim();
+    const classification = String(record["التصنيف"]).trim();
+
+    allClassificationsSet.add(classification);
+
+    if (!cityClassificationMap[city]) {
+      cityClassificationMap[city] = {};
+    }
+    cityClassificationMap[city][classification] = (cityClassificationMap[city][classification] || 0) + 1;
+  });
+
+  const cities = Object.keys(cityClassificationMap);
+  const classifications = Array.from(allClassificationsSet);
+  const total = validRecords.length;
+
+  // ألوان مخصصة للتصنيفات (مثل وضع يد وعقد منتهى)
+  const colorMapping = {
+    "وضع يد": "#CB2C30",       // أحمر
+    "عقد منتهى": "#768692",    // رمادي/أزرق هادئ
+    "موثقة": "#00778B",
+    "طلب تعديل": "#20A4B8"
+  };
+  const fallbackColors = ["#00778B", "#20A4B8", "#CB2C30", "#768692", "#8A6BBE"];
+
+  // إعداد مجموعات البيانات (Datasets) للشارت المتراكم
+  const datasets = classifications.map((classification, index) => {
+    const data = cities.map(city => {
+      return cityClassificationMap[city][classification] || 0;
+    });
+
+    const color = colorMapping[classification] || fallbackColors[index % fallbackColors.length];
+
+    return {
+      label: classification,
+      data: data,
+      backgroundColor: color,
+      borderRadius: 4
+    };
+  });
+
+  // تحديث تفاصيل الليجند السفلية للشارت
+  const detailsContainer = document.getElementById("city-legend-details");
+  if (detailsContainer) {
+    detailsContainer.innerHTML = classifications.map((classification, index) => {
+      const color = colorMapping[classification] || fallbackColors[index % fallbackColors.length];
+      const count = validRecords.filter(r => String(r["التصنيف"]).trim() === classification).length;
+      const percent = total > 0 ? ((count / total) * 100).toFixed(1) : "0.0";
+      return `
+        <div class="chart-detail-item" style="display: flex; align-items: center; justify-content: space-between;">
+          <div class="chart-detail-info" style="display: flex; align-items: center; gap: 8px;">
+            <span class="chart-detail-color" style="width: 12px; height: 12px; border-radius: 3px; background-color: ${color}; display: inline-block;"></span>
+            <span class="chart-detail-label" style="font-weight: 500;">${classification}</span>
+          </div>
+          <span class="chart-detail-stats" style="color: var(--color-text-muted);">${count} (${percent}%)</span>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // رسم شارت المدن المستقل (Stacked Bar Chart)
+  const canvas = document.getElementById("cityEncroachmentChart");
+  if (canvas) {
+    const ctx = canvas.getContext("2d");
+    if (cityEncroachmentChart) cityEncroachmentChart.destroy();
+
+   cityEncroachmentChart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: cities,
+        datasets: datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            stacked: true,
+            grid: { display: false }
+          },
+          y: {
+            stacked: true,
+            beginAtZero: true,
+            ticks: { precision: 0 }
+          }
+        },
+        plugins: {
+          legend: { 
+            display: false // <--- تم تغييرها إلى false لإخفاء مفتاح الألوان والتصنيفات تماماً
+          },
+          tooltip: {
+            callbacks: {
+              label(context) {
+                return `${context.dataset.label}: ${context.raw} حالة`;
+              }
+            }
+          }
+        },
+        onClick(event, elements) {
+          if (!elements.length) return;
+          const clickedCity = cities[elements[0].index];
+          const filteredRecords = originalRecords.filter(record => {
+            return normalize(record["المدينة"]) === normalize(clickedCity);
+          });
+          refreshDashboard(filteredRecords);
+        }
+      }
+    });
+  }
+
+  // --- الكارد المقابل: عرض التسلسل الرقمي، المدينة، رقم الأرض، والتصنيف ---
+  // --- الكارد المقابل: عرض التسلسل الرقمي، المدينة، رقم الأرض، المتعدي، والتصنيف ---
+  const recordsContainer = document.getElementById("city-records-container");
+  const recordsCountLabel = document.getElementById("city-records-count");
+
+  if (recordsCountLabel) {
+    recordsCountLabel.textContent = validRecords.length;
+  }
+
+  if (recordsContainer) {
+    if (validRecords.length === 0) {
+      recordsContainer.innerHTML = `<p style="text-align: center; color: var(--color-text-muted); padding: 20px;">لا توجد بيانات مطابقة</p>`;
+    } else {
+      recordsContainer.innerHTML = validRecords.map((record, index) => {
+        const city = record["المدينة"] || "-";
+        const landNo = record["رقم_الارض"] || "-";
+        const trespasser = record["المتعدي"] || "-"; // جلب اسم المتعدي
+        const classification = record["التصنيف"] || "-";
+        const statusColor = colorMapping[classification] || "#00778B";
+
+        return `
+          <div style="background: var(--color-background); border: 1px solid var(--color-border); border-radius: var(--border-radius-sm); padding: 12px 14px; font-size: 0.9rem; display: flex; flex-direction: column; gap: 8px;">
+            <!-- التسلسل والتصنيف -->
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-border); padding-bottom: 6px;">
+              <strong style="color: var(--color-primary);"># ${index + 1} - المدينة: ${city}</strong>
+              <span style="background-color: ${statusColor}15; color: ${statusColor}; border: 1px solid ${statusColor}40; padding: 3px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 600;">${classification}</span>
+            </div>
+            
+            <!-- الحقول التفصيلية (رقم الأرض واسم المتعدي) -->
+            <div style="display: flex; flex-direction: column; gap: 4px; color: var(--color-text); font-size: 0.85rem;">
+              <div><strong>رقم الأرض:</strong> ${landNo}</div>
+              <div><strong>المتعدي:</strong> ${trespasser}</div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+  }
+}
 /**
  * دالة طباعة وبناء بطاقات مؤشرات الأداء الرئيسية في الواجهة
  * بداية الدالة
@@ -716,6 +856,8 @@ function renderKpis(records) {
   `).join("");
 }
 // نهاية الدالة
+
+
 
 /**
  * دالة تهيئة وتحميل بيانات النظام من ملف JSON الخارجي
@@ -755,3 +897,4 @@ document.addEventListener("click", (e) => {
 
 // تشغيل النظام عند التحميل
 initKpis();
+

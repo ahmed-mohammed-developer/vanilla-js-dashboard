@@ -137,6 +137,9 @@ function renderKpis(records) {
 /**
  * دالة إنشاء وتحديث قسم آخر التحديثات بناءً على حقل الملاحظات في قاعدة البيانات
  */
+/**
+ * دالة إنشاء وتحديث قسم آخر التحديثات بناءً على حقل الملاحظات في قاعدة البيانات
+ */
 function renderUpdatesSection(records) {
   // تصفية السجلات التي تحتوي على ملاحظات غير فارغة
   const updatesRecords = records.filter(record => hasValue(record["ملاحظات"]));
@@ -156,16 +159,25 @@ function renderUpdatesSection(records) {
     container.innerHTML = updatesRecords.map((record, index) => {
       const city = record["المدينة"] || "-";
       const landNo = record["رقم_الارض"] || "-";
+      const nameCustomer = record["المتعدي"] || "-";
       const notes = record["ملاحظات"] || "-";
       const classification = record["التصنيف"] || "-";
 
       return `
         <div style="background: var(--color-background); border: 1px solid var(--color-border); border-radius: var(--border-radius-sm); padding: 12px 16px; font-size: 0.9rem; display: flex; flex-direction: column; gap: 8px;">
+          <!-- ترويسة البطاقة -->
           <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-border); padding-bottom: 6px;">
             <strong style="color: var(--color-primary);"># ${index + 1} - المدينة: ${city} (رقم الأرض: ${landNo})</strong>
             <span style="background: rgba(0, 119, 139, 0.08); color: var(--color-primary); padding: 3px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 600;">${classification}</span>
           </div>
-          <div style="color: var(--color-text); font-size: 0.9rem; line-height: 1.6; display: flex; align-items: flex-start; gap: 8px;">
+          
+          <!-- اسم المتعدي -->
+          <div style="color: var(--color-text); font-size: 0.88rem; display: flex; gap: 6px;">
+            <strong>المتعدي:</strong> <span>${nameCustomer}</span>
+          </div>
+
+          <!-- نص الملاحظة -->
+          <div style="color: var(--color-text); font-size: 0.9rem; line-height: 1.6; display: flex; align-items: flex-start; gap: 8px; border-top: 1px dashed var(--color-border); padding-top: 6px; margin-top: 2px;">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-top: 3px; color: var(--color-primary);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
             <span>${notes}</span>
           </div>

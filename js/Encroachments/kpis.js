@@ -164,11 +164,11 @@ function renderUpdatesSection(records) {
       const classification = record["التصنيف"] || "-";
 
       return `
-        <div style="background: var(--color-background); border: 1px solid var(--color-border); border-radius: var(--border-radius-sm); padding: 12px 16px; font-size: 0.9rem; display: flex; flex-direction: column; gap: 8px;">
+        <div style="background: var(--color-background); border: 1px solid var(--color-border); border-radius: var(--border-radius-sm); padding: 12px 16px; font-size: 0.6rem; display: flex; flex-direction: column; gap: 8px;">
           <!-- ترويسة البطاقة -->
           <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-border); padding-bottom: 6px;">
             <strong style="color: var(--color-primary);"># ${index + 1} - المدينة: ${city} (رقم الأرض: ${landNo})</strong>
-            <span style="background: rgba(0, 119, 139, 0.08); color: var(--color-primary); padding: 3px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 600;">${classification}</span>
+            <span style="background: rgba(0, 119, 139, 0.08); color: var(--color-primary); padding: 3px 10px; border-radius: 999px; font-size: 0.5rem; font-weight: 600;">${classification}</span>
           </div>
           
           <!-- اسم المتعدي -->

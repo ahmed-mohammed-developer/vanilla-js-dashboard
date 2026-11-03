@@ -147,7 +147,11 @@
   width: 24px;
   height: 24px;
 }
-
+.navbar__link.disabled-link {
+  pointer-events: none; /* يمنع النقر نهائياً */
+  opacity: 0.5;         /* يقلل وضوح العنصر ليبدو معطلاً */
+  cursor: not-allowed;  /* يغير مؤشر الماوس */
+}
 /* =========================
    Responsive Design
 ========================= */
@@ -197,5 +201,26 @@
    display: none;
   }
   }
+
+
+  /* ================================================= الفوتر الختامي ================================================= */
+.dashboard-footer {
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  padding: 24px 20px;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  box-shadow: 0 -4px 12px rgba(32, 61, 68, .02);
 }
 
+.dashboard-footer p {
+  line-height: 1.5;
+}
+
+@media (max-width: 767px) {
+  .dashboard-footer {
+    padding: 16px;
+    font-size: 0.78rem;
+  }
+}

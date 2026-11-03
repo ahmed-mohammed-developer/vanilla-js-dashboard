@@ -30,15 +30,15 @@ if (navbarContainer) {
           id="primary-navigation"
           aria-label="القائمة الرئيسية"
         >
-          <a class="navbar__link" href="/index.html" data-page="index.html">
+          <a class="navbar__link disabled-link" href="javascript:void(0);" data-page="index.html" aria-disabled="true">
             الرئيسية
           </a>
 
-          <a class="navbar__link" href="target2026.html" data-page="target2026.html">
+          <a class="navbar__link disabled-link" href="javascript:void(0);" data-page="target2026.html" aria-disabled="true">
             هدف 2026م
           </a>
 
-          <a class="navbar__link" href="/deeds.html" data-page="deeds.html">
+          <a class="navbar__link disabled-link" href="javascript:void(0);" data-page="deeds.html" aria-disabled="true">
             نقل الصكوك
           </a>
 
@@ -46,9 +46,8 @@ if (navbarContainer) {
             التعديات
           </a>
         </nav>
- <!-- الشعار -->
+        <!-- الشعار -->
         <a class="navbar__brand" href="/index.html" aria-label="سار - الرئيسية">
-
           <span class="navbar__brand-text">
             <span class="navbar__brand-name">الشركة السعودية للخطوط الحديدية</span>
           </span>
@@ -69,16 +68,14 @@ if (navbarContainer) {
   // ========================================
 
   const currentPath = window.location.pathname;
-
-  // استخراج اسم الصفحة من الرابط
   const currentPage = currentPath.split("/").pop().toLowerCase();
-
-  // اعتبار الصفحة الرئيسية هي index.html إذا كان المسار فارغًا
   const activePage = currentPage || "index.html";
 
   navLinks.forEach((link) => {
-    const linkPage = link.dataset.page.toLowerCase();
+    // نتأكد أن الروابط المعطلة لا تأخذ حالة النشط الا إذا رغبت
+    if (link.classList.contains("disabled-link")) return;
 
+    const linkPage = link.dataset.page.toLowerCase();
     const isActive = linkPage === activePage;
 
     link.classList.toggle("is-active", isActive);
@@ -96,9 +93,7 @@ if (navbarContainer) {
 
   function setMenuOpen(isOpen) {
     navigation.classList.toggle("is-open", isOpen);
-
     menuToggle.setAttribute("aria-expanded", String(isOpen));
-
     menuToggle.setAttribute(
       "aria-label",
       isOpen ? "إغلاق القائمة" : "فتح القائمة"
@@ -107,15 +102,17 @@ if (navbarContainer) {
 
   // الاستجابة للضغط على زر القائمة
   menuToggle.addEventListener("click", () => {
-    const isOpen =
-      menuToggle.getAttribute("aria-expanded") === "true";
-
+    const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
     setMenuOpen(!isOpen);
   });
 
-  // إغلاق القائمة عند الضغط على أحد الروابط
+  // إغلاق القائمة عند الضغط على أحد الروابط (باستثناء المعطلة)
   navLinks.forEach((link) => {
-    link.addEventListener("click", () => {
+    link.addEventListener("click", (e) => {
+      if (link.classList.contains("disabled-link")) {
+        e.preventDefault(); // منع أي استجابة للرابط المعطل
+        return;
+      }
       setMenuOpen(false);
     });
   });

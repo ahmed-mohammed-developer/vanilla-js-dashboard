@@ -759,5 +759,106 @@ document.addEventListener("click", (e) => {
   refreshDashboard(originalRecords);
 });
 
+/**
+ * دالة تنفيذ البحث الشامل وعرض النتائج وإخفاء باقي الأقسام
+ */
+/**
+ * دالة تنفيذ البحث الشامل وعرض النتائج وإخفاء باقي الأقسام
+ */
+function handleGlobalSearch(query, records) {
+  const searchSection = document.getElementById("search-results-section");
+  const resultsContainer = document.getElementById("search-results-container");
+  const countLabel = document.getElementById("search-results-count");
+  
+  const mainSections = document.querySelectorAll(".kpi-section, .charts-section, .charts-section2");
+  const searchTerm = query.trim().toLowerCase();
+
+  if (!searchTerm) {
+    if (searchSection) searchSection.style.display = "none";
+    mainSections.forEach(sec => sec.style.display = "");
+    return;
+  }
+
+  mainSections.forEach(sec => sec.style.display = "none");
+  if (searchSection) searchSection.style.display = "block";
+
+  const matchedRecords = records.filter(record => {
+    return Object.values(record).some(value => 
+      String(value ?? "").toLowerCase().includes(searchTerm)
+    );
+  });
+
+  if (countLabel) countLabel.textContent = matchedRecords.length;
+  if (!resultsContainer) return;
+
+  // جدول ربط الألوان الثابتة للتصنيفات
+  const colorMapping = {
+    "وضع يد": "#CB2C30",    // أحمر
+    "عقد منتهى": "#768692" // رمادي مساند
+  };
+
+  if (matchedRecords.length === 0) {
+    resultsContainer.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: var(--color-text-muted); padding: 30px;">لا توجد نتائج مطابقة لبحثك ("${query}")</p>`;
+  } else {
+    resultsContainer.innerHTML = matchedRecords.map((record, index) => {
+      const city = record["المدينة"] || "-";
+      const landNo = record["رقم_الارض"] || "-";
+      const classification = record["التصنيف"] || "-";
+      const subClassification = record["التصنيف_الفرعي"] || "-";
+      const trespasser = record["المتعدي"] || "-";
+      const status = record["حالة_التعدي"] || "-";
+      const policeReport = record["رقم_بلاغ_الشرطة"] || "غير مسجل";
+      const caseStatus = record["حالة_القضية"] || "لا توجد قضية";
+      const rentalIncident = record["رقم_الواقعة_الإيجارية"] || "لا توجد";
+      const notes = record["ملاحظات"] || "لا توجد ملاحظات";
+
+      // تحديد لون الشارة بناءً على التصنيف (مع لون افتراضي احتياطي)
+      const classificationColor = colorMapping[classification] || "#00778B";
+
+      return `
+        <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--border-radius-md); padding: 16px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-border); padding-bottom: 8px;">
+            <strong style="color: var(--color-primary); font-size: 1rem;"># ${index + 1} - ${city}</strong>
+            <span style="background-color: ${classificationColor}15; color: ${classificationColor}; border: 1px solid ${classificationColor}40; padding: 3px 10px; border-radius: 999px; font-size: 0.78rem; font-weight: 600;">${classification}</span>
+          </div>
+          
+          <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.88rem; color: var(--color-text);">
+            <div><strong>رقم الأرض:</strong> ${landNo}</div>
+            <div><strong>المتعدي:</strong> ${trespasser}</div>
+            <div><strong>التصنيف الفرعي:</strong> ${subClassification}</div>
+            <div><strong>حالة التعدي:</strong> ${status}</div>
+            <div><strong>رقم بلاغ الشرطة:</strong> ${policeReport}</div>
+            <div><strong>حالة القضية:</strong> ${caseStatus}</div>
+            <div><strong>الواقعة الإيجارية:</strong> ${rentalIncident}</div>
+            <div style="background: var(--color-background); padding: 8px; border-radius: var(--border-radius-sm); margin-top: 4px; font-size: 0.85rem;">
+              <strong>ملاحظات:</strong> ${notes}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+}
+
+/**
+ * ربط مستمع الحدث لحقل البحث وإلغاء البحث
+ */
+document.addEventListener("input", (e) => {
+  if (e.target && e.target.id === "global-search-input") {
+    handleGlobalSearch(e.target.value, originalRecords);
+  }
+});
+
+document.addEventListener("click", (e) => {
+  if (e.target && e.target.id === "clear-search-btn") {
+    const searchInput = document.getElementById("global-search-input");
+    if (searchInput) {
+      searchInput.value = "";
+      handleGlobalSearch("", originalRecords);
+    }
+  }
+});
+
+
 // تشغيل النظام عند التحميل
 initKpis();

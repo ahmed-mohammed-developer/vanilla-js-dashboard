@@ -106,7 +106,7 @@ button, a {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 20px;
   padding: 20px;
   background-color: var(--color-background);
   border: 1px solid var(--color-border);
@@ -115,6 +115,7 @@ button, a {
   text-align: right;
   cursor: pointer;
   transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  margin-bottom: 10px 10px 10px 0;
 }
 
 /* خط تزييني جانبي لكل بطاقة بناءً على لونها المميز */
@@ -359,6 +360,52 @@ button, a {
   color: var(--color-primary);
   font-variant-numeric: tabular-nums;
 }
+
+/* ================================================= شارة آخر تحديث ================================================= */
+.last-update-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.last-update-badge svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.last-update-badge strong {
+  color: var(--color-text);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin-right: 2px;
+}
+
+/* التجاوب مع الشاشات الصغيرة */
+@media (max-width: 767px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .last-update-badge {
+    width: 100%;
+    justify-content: flex-start;
+    font-size: 0.78rem;
+    padding: 6px 12px;
+  }
+}
+
 /* ================================================= التجاوب مع مختلف الشاشات (Media Queries) ================================================= */
 @media (min-width: 1200px) {
   .charts-section { grid-template-columns: repeat(3, 1fr); }

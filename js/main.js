@@ -1,7 +1,6 @@
-// تحميل ملف Navbar
-import("./navbar.js");
+import "./navbar.js";
 
-// تحميل ملف SEO
-import("./encroachments.js");
-
+if (document.getElementById("kpi-container")) {
+  import("./encroachments.js");
+}
 

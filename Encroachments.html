@@ -40,18 +40,40 @@
                 <p class="eyebrow">لوحة تحكم</p>
                 <h1>التعديات</h1>
             </div>
+            <!-- شارة آخر تحديث -->
+    <div class="last-update-badge" id="last-update-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 7v5l3 2"/>
+        </svg>
+        <span>آخر تحديث: <strong id="last-update-time">جاري التحميل...</strong></span>
+    </div>
         </header>
 
         <!-- المؤشرات الرئيسية -->
+     <!-- المؤشرات الرئيسية -->
         <section class="kpi-section" aria-labelledby="kpi-heading">
-            <div class="section-heading">
+            <div class="chart-header">
                 <div>
                     <h2 id="kpi-heading">المؤشرات الرئيسية</h2>
                 </div>
             </div>
             <div id="kpi-container" class="kpi-grid" aria-live="polite"></div>
         </section>
-
+<!-- قسم آخر التحديثات والملاحظات الواردة -->
+<section class="charts-section2" style="margin-top: 20px;">
+  <div class="chart-header">
+    <div>
+      <h2> التحديثات الأخيرة (<span id="updates-count">0</span>)</h2>
+    </div>
+  </div>
+  
+  <div class="card-legal" style="grid-template-columns: 1fr;">
+    <div id="updates-records-container" style="max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-top: 5px;">
+      <!-- يتم تعبئتها ديناميكياً عبر الجافاسكربت -->
+    </div>
+  </div>
+</section>
         <!-- قسم الرسوم البيانية -->
         <section class="charts-section">
 
@@ -143,6 +165,9 @@
     <!-- الجزء الثاني: كارد/قسم بيانات الوقائع الإيجارية والتفاصيل -->
     <div class="chart-card-legal">
       <div class="chart-header">
+      <div>
+          <h3>قائمة الوقائع الإيجارية (<span id="rental-records-count">0</span>)</h3>
+        </div>
         <div>
         </div>
       </div>
@@ -159,7 +184,7 @@
 <section class="charts-section2" style="margin-top: 30px;">
   <div class="chart-header">
     <div>
-      <h2>توزيع التعديات حسب المدن والتصنيفات</h2>
+      <h2> التعديات حسب المدن </h2>
     </div>
     <button class="reset-filter" onclick="refreshDashboard(originalRecords)">إزالة الفلتر</button>
   </div>
@@ -179,7 +204,7 @@
     <div class="chart-card-legal">
       <div class="chart-header">
         <div>
-          <h3>قائمة السجلات وتفاصيل الأراضي (<span id="city-records-count">0</span>)</h3>
+          <h3>قائمة  التعديات (<span id="city-records-count">0</span>)</h3>
         </div>
       </div>
       

@@ -1,3 +1,3 @@
-// تحميل ملف kpis.js
-import("./Encroachments/kpis.js");
-import("./Encroachments/map.js");
+import "./Encroachments/kpis.js";
+
+initSaudiMapEvents();

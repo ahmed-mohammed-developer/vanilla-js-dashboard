@@ -763,6 +763,7 @@ document.addEventListener("click", (e) => {
  * دالة تنفيذ البحث الشامل وعرض النتائج وإخفاء باقي الأقسام
  */
 /**
+/**
  * دالة تنفيذ البحث الشامل وعرض النتائج وإخفاء باقي الأقسام
  */
 function handleGlobalSearch(query, records) {
@@ -770,17 +771,38 @@ function handleGlobalSearch(query, records) {
   const resultsContainer = document.getElementById("search-results-container");
   const countLabel = document.getElementById("search-results-count");
   
-  const mainSections = document.querySelectorAll(".kpi-section, .charts-section, .charts-section2");
-  const searchTerm = query.trim().toLowerCase();
+  const mainSections = document.querySelectorAll(".kpi-section, .charts-section, .charts-section2:not(#search-results-section)");
+  const searchTerm = query ? query.trim().toLowerCase() : "";
 
+  // إذا كان حقل البحث فارغاً أو تم النقر على إلغاء البحث
   if (!searchTerm) {
-    if (searchSection) searchSection.style.display = "none";
-    mainSections.forEach(sec => sec.style.display = "");
+    if (searchSection) {
+      searchSection.style.display = "none"; // إخفاء صندوق النتائج تماماً
+    }
+    if (resultsContainer) {
+      resultsContainer.innerHTML = ""; // تفريغ البطاقات القديمة
+    }
+    if (countLabel) {
+      countLabel.textContent = "0";
+    }
+
+    // إظهار أقسام اللوحة الرئيسية مرة أخرى
+    document.querySelectorAll(".kpi-section, .charts-section").forEach(sec => sec.style.display = "");
+    document.querySelectorAll(".charts-section2").forEach(sec => {
+      if (sec.id !== "search-results-section") sec.style.display = "";
+    });
     return;
   }
 
-  mainSections.forEach(sec => sec.style.display = "none");
-  if (searchSection) searchSection.style.display = "block";
+  // عند وجود بحث نشط: إخفاء الأقسام وإظهار قسم النتائج فقط
+  document.querySelectorAll(".kpi-section, .charts-section").forEach(sec => sec.style.display = "none");
+  document.querySelectorAll(".charts-section2").forEach(sec => {
+    if (sec.id !== "search-results-section") sec.style.display = "none";
+  });
+
+  if (searchSection) {
+    searchSection.style.display = "block";
+  }
 
   const matchedRecords = records.filter(record => {
     return Object.values(record).some(value => 
@@ -791,7 +813,6 @@ function handleGlobalSearch(query, records) {
   if (countLabel) countLabel.textContent = matchedRecords.length;
   if (!resultsContainer) return;
 
-  // جدول ربط الألوان الثابتة للتصنيفات
   const colorMapping = {
     "وضع يد": "#CB2C30",    // أحمر
     "عقد منتهى": "#768692" // رمادي مساند
@@ -812,7 +833,6 @@ function handleGlobalSearch(query, records) {
       const rentalIncident = record["رقم_الواقعة_الإيجارية"] || "لا توجد";
       const notes = record["ملاحظات"] || "لا توجد ملاحظات";
 
-      // تحديد لون الشارة بناءً على التصنيف (مع لون افتراضي احتياطي)
       const classificationColor = colorMapping[classification] || "#00778B";
 
       return `
@@ -839,7 +859,6 @@ function handleGlobalSearch(query, records) {
     }).join("");
   }
 }
-
 /**
  * ربط مستمع الحدث لحقل البحث وإلغاء البحث
  */
